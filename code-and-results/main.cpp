@@ -7,12 +7,10 @@ using namespace std;
 void menu();
 
 int main(int argc, char const *argv[]){
-  cout << "Hello World." << endl;
   menu();
-
-  return 1;
+  return 0;
 }
 
-void menu() {
-
+void menu(){
+  cout << "Hello World." << endl;
 }

@@ -8,16 +8,21 @@ using namespace arma;
 using namespace std;
 
 class MonteCarlo {
+
+public:
+  void initialize();
+};
+
+class IsingModel : public MonteCarlo{
+
 protected:
   double energy;
 
 public:
-  void initialize();
+  void init();
   void magnetization();
   void energy();
   void specHeat();
   vec spins;
 };
-
-
 #endif
