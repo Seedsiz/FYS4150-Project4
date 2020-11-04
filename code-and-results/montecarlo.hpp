@@ -11,6 +11,7 @@ class MonteCarlo {
 
 public:
   void initialize();
+  void RNG(); // random number generator;
 };
 
 class IsingModel : public MonteCarlo{
