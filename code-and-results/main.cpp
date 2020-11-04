@@ -12,5 +12,14 @@ int main(int argc, char const *argv[]){
 }
 
 void menu(){
-  cout << "Hello World." << endl;
+  int L; double T;
+  cout << "Enter integer number of spin particles for each axis:" << " ";
+  cin >> L;
+  cout << "Choose a temperature T:"  << " ";
+  cin >> T;
+
+  //Tryout random generator
+  MonteCarlo mysolver;
+  mysolver.initialize(L,T);
+  mysolver.draw_acceptance();
 }
