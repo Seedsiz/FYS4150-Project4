@@ -16,7 +16,7 @@ protected:
   double m_check; // the random r in [0,1] acceptance criteria
   vec m_map; // a mapping instead of ghost cells
   vec getBoltzmann;
-  double m_prob_ratio;
+  double m_w;
 
 public:
   void initialize(int L, double T);

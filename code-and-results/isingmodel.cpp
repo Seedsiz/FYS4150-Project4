@@ -22,7 +22,7 @@ void IsingModel2D::init(){
   getBoltzmann(0) = exp(-8);
   getBoltzmann(2) = exp(-4);
   getBoltzmann(4) = 1;       //exp(0)
-  getBoltzmann(8) = 8;
+  getBoltzmann(8) = exp(8);
 }
 
 void IsingModel2D::magnetization(){
@@ -57,5 +57,5 @@ void IsingModel2D::find_deltaE(int i, int j){
   int S4 =  S(m_map(i)*m_L + m_map(j+1));
   int spin_sum = S1 + S2 + S3 + S4;
   int mapping = spin_sum + 4;
-  m_prob_ratio = getBoltzmann(mapping); //
+  m_w = getBoltzmann(mapping); //
 }
