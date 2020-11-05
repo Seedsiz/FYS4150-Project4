@@ -14,7 +14,9 @@ protected:
   int m_T; //temperature
   int m_rand; // the random index to draw
   double m_check; // the random r in [0,1] acceptance criteria
-
+  vec m_map; // a mapping instead of ghost cells
+  vec getBoltzmann;
+  double m_prob_ratio;
 
 public:
   void initialize(int L, double T);
@@ -33,6 +35,7 @@ public:
   void init();
   void magnetization();
   void energy();
+  void find_deltaE(int flip_i, int flip_j);
   void specHeat();
   void solve();
 };

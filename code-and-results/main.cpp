@@ -21,5 +21,5 @@ void menu(){
   //Tryout random generator
   MonteCarlo mysolver;
   mysolver.initialize(L,T);
-  mysolver.draw_acceptance();
+  mysolver.draw_index();
 }
