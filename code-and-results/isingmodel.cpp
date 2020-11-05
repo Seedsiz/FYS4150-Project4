@@ -17,12 +17,17 @@ void IsingModel2D::init(){
     m_map(i+1) = i;
   }
   // remember to cout to see if this is correct
-
+  m_beta = 1/m_T;
   getBoltzmann = vec(9); // 5 different energy states: Scale J to 1;
-  getBoltzmann(0) = exp(-8);
-  getBoltzmann(2) = exp(-4);
-  getBoltzmann(4) = 1;       //exp(0)
-  getBoltzmann(8) = exp(8);
+  getdeltaE = vec(9);
+  getBoltzmann(0) = exp(-8.0);
+  getBoltzmann(2) = exp(-4.0);
+  getBoltzmann(4) = 1.0;       //exp(0)
+  getBoltzmann(8) = exp(8.0);
+  getdeltaE(0) = -8.0;
+  getdeltaE(2) = -4.0;
+  getdeltaE(4) = 0.0;
+  getdeltaE(8) = 8.0;
 }
 
 void IsingModel2D::magnetization(){
@@ -37,19 +42,14 @@ int i_p; int j_p;
 for (int i = 1; i <= m_L+1; i++){
   for (int j = 1; j <=m_L+1; j++){
     i_p = m_map(i); j_p = m_map(j); // mapping to physical mesh points
-    E += S(i_p*m_L+j_p)*S(i_p*m_L+j_p+1) + \
-          S(i_p*m_L + j_p)*S((i_p+1)*m_L + j_p);
+    m_Energy += S(i_p*m_L+j_p)*S(i_p*m_L+j_p+1) + \
+        S(i_p*m_L + j_p)*S((i_p+1)*m_L + j_p);
     }
   }
 }
 
-void IsingModel2D::specHeat() {
-}
-
-void IsingModel2D::solve(){
-}
-
 void IsingModel2D::find_deltaE(int i, int j){
+  // take in suggested random indices
   // use the sum of spins, then map to a deltaE;
   int S1 =  S(m_map(i-1)*m_L + m_map(j));
   int S2 =  S(m_map(i+1)*m_L + m_map(j));
@@ -58,4 +58,11 @@ void IsingModel2D::find_deltaE(int i, int j){
   int spin_sum = S1 + S2 + S3 + S4;
   int mapping = spin_sum + 4;
   m_w = getBoltzmann(mapping); //
+  m_deltaE = getdeltaE(mapping);
+}
+
+void IsingModel2D::specHeat() {
+}
+
+void IsingModel2D::solve(){
 }
