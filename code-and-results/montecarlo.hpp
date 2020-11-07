@@ -15,6 +15,7 @@ protected:
   int m_rand; // the random index to draw
   double m_check; // the random r in [0,1] acceptance criteria
   vec m_map; // a mapping instead of ghost cells
+  vec S;     //lattice converted to a flat array
   vec getBoltzmann;
   double m_w;
 
@@ -32,7 +33,7 @@ protected:
   vec S; // A vector containing all spins; must be initalized in a random state
 
 public:
-  void init();
+  void init(int L, double temp);
   void magnetization();
   void energy();
   void find_deltaE(int flip_i, int flip_j);

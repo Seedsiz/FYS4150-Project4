@@ -7,12 +7,13 @@ using namespace arma;
 using namespace std;
 
 
-void IsingModel2D::init(){
+void IsingModel2D::init(int L, double temp){
   // Create mapping vector so that physical mesh points are
   // connected to ghost cells (check that these are int!!!)
   m_map = vec(m_L+2);
   m_map(0) = m_L-1;
   m_map(m_L+1) = 0;
+  m_T = temp;
   for (int i = 0; i <= m_L; i++){
     m_map(i+1) = i;
   }
@@ -23,6 +24,27 @@ void IsingModel2D::init(){
   getBoltzmann(2) = exp(-4);
   getBoltzmann(4) = 1;       //exp(0)
   getBoltzmann(8) = exp(8);
+
+  S = vec(L*L);   //Setting up lattice of L*L elements
+  draw_acceptance();    //Getting random number
+  if(m_T >= 1) {        //Temperature check
+    for(int i = 0; i < L*L; i++) {    //If the temperature is greater than 1,
+      if(m_check < 0.5) {             //the lattice is filled with random spins.
+        S(i) = -1;
+      }else {
+        S(i) = 1;
+      }
+      draw_acceptance();
+    }
+  }else {
+    for(int i = 0; i < L*L; i++) {    //If the temperature is smaller than 1,
+      if(m_check < 0.5) {             //the mattice is filled with either only
+        S(i) = -1;                    //positive spins, or only negative.
+      }else {
+        S(i) = 1;
+      }
+    }
+  }
 }
 
 void IsingModel2D::magnetization(){

@@ -21,5 +21,8 @@ void menu(){
   //Tryout random generator
   MonteCarlo mysolver;
   mysolver.initialize(L,T);
-  mysolver.draw_index();
+  //mysolver.draw_index();
+  //mysolver.draw_acceptance();
+  IsingModel2D model;
+  model.init(L, T);
 }

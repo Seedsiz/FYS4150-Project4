@@ -30,7 +30,7 @@ void MonteCarlo::draw_acceptance(){
   mt19937_64 gen(sd);                                                       // seeded with sd
   uniform_real_distribution<double> distribution(0.0,1.0);                  // creates [0,1)
   m_check =  distribution(gen);                                             // draw acceptance criteria
-  cout <<  m_check << endl;
+  //cout << m_check << endl;
 };
 
 void MonteCarlo::metropolis(){
