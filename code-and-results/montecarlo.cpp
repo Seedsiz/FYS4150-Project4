@@ -9,7 +9,7 @@ using namespace chrono;
 void MonteCarlo::initialize(int L, double T){
   m_L = L;
   m_T = T;
-  }
+}
 
 void MonteCarlo::draw_index(){ // random number generator;
     /* Mersenne twister random generator suggest
@@ -17,8 +17,13 @@ void MonteCarlo::draw_index(){ // random number generator;
     */
   int rd = chrono::high_resolution_clock::now().time_since_epoch().count(); //+ rank <--  for parallellization;
   mt19937_64 gen(rd);      // seeded with rd
-  uniform_int_distribution<> distribution(1, (m_L-1)); // Choose uniform distr. with range 1,(m_L-1) (unsigned integer)
-  m_rand =  distribution(gen); // Draw index, flip this  (PS, needs to call for both i and j values)
+  uniform_int_distribution<> distribution_i(1, (m_L-1)); // Choose uniform distr. with range 1,(m_L-1) (unsigned integer)
+  m_rand_i =  distribution_i(gen); // Draw index, flip this  (PS, needs to call for both i and j values)
+
+  int sd = chrono::high_resolution_clock::now().time_since_epoch().count(); //+ rank <--  for parallellization;
+  mt19937_64 hen(sd);     // seeded with sd
+  uniform_int_distribution<> distribution_j(1, (m_L-1)); // Choose uniform distr. with range 1,(m_L-1) (
+  m_rand_j =  distribution_j(gen);
   //cout <<  m_rand;
 };
 
@@ -42,11 +47,12 @@ if (m_check <= w){
   }
 }
 
-void MonteCarlo::monte_carlo(vec S, int i, int j){ // calculates one cycle only
+void MonteCarlo::monte_carlo(vec S){ // calculates one cycle only
   // sends in the indices suggested if metropolis gives true
   // update expectation values and flip
-  S(m_map(i)*m_L + m_map(j)) *= -1.0;    // flip one spin and accept new spin config
-	  m_MagneticMoment += 2*S(m_map(i)*m_L + m_map(j)); // check why this is like this
+  draw_index();
+  S(m_map(m_rand_i)*m_L + m_map(m_rand_j)) *= -1.0;    // flip one spin and accept new spin config
+	  m_MagneticMoment += 2*S(m_map(m_rand_i)*m_L + m_map(m_rand_j)); // check why this is like this
 	  m_Energy += m_deltaE; // beregn summen av energi, del til slutt på antall sykluser.
 };
 
