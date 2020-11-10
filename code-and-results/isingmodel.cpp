@@ -45,7 +45,7 @@ void IsingModel2D::init(int L, double temp, int MC){
     }
   }else {
     for(int i = 0; i < L*L; i++) {    //If the temperature is smaller than 1,
-      if(m_check < 0.5) {             //the mattice is filled with either only
+      if(m_check < 0.5) {             //the lattice is filled with either only
         S(i) = -1;                    //positive spins, or only negative.
       }else {
         S(i) = 1;
@@ -71,12 +71,14 @@ void IsingModel2D::energy(){
 /* Code for energy for one specific
 state with periodic boundary conditions (2D) */
 int i_p; int j_p;
+int i_pp; int j_pp;   //Same as i_p and j_p only i+1 and j+1
 // Calculating total energy by multiplying below and to the right
 for (int i = 1; i <= m_L+1; i++){
-  for (int j = 1; j <=m_L+1; j++){
+  for (int j = 1; j <= m_L+1; j++){
     i_p = m_map(i); j_p = m_map(j); // mapping to physical mesh points
-    m_Energy += S(i_p*m_L+j_p)*S(i_p*m_L+j_p+1) + \
-        S(i_p*m_L + j_p)*S((i_p+1)*m_L + j_p);
+    i_pp = m_map(i+1); j_pp = m_map(j+1); // mapping to physical mesh points
+    m_Energy += S(i_p*m_L+j_p)*S(i_p*m_L+j_pp) + \
+        S(i_p*m_L + j_p)*S((i_pp)*m_L + j_p);
     }
   }
 }

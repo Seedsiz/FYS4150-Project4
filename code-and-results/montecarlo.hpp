@@ -12,7 +12,8 @@ class MonteCarlo{
 protected:
   int m_L; // number of grid points (spin particles) // move these two maybe
   int m_T; //temperature
-  int m_rand; // the random index to draw
+  int m_rand_i; // the random index to draw
+  int m_rand_j; // the random index to draw
   double m_check; // the random r in [0,1] acceptance criteria
   vec m_map; // a mapping instead of ghost cells
   vec getBoltzmann; // A vector containing boltzmann (deltaEs)
@@ -30,7 +31,8 @@ public:
   void draw_index(); // random number generator: get flip index
   void draw_acceptance(); // rnd get r [0,1] acceptance criteria
   void metropolis(double w); // sampling rule;
-  void monte_carlo(vec S, int flip_i, int flip_j); // calculates one MC cycle only
+  void monte_carlo(vec S); // calculates one MC cycle only
+  void expectation_values();             // Get expectation_values
 };
 
 class IsingModel2D: public MonteCarlo{
