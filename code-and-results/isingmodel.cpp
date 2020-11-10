@@ -7,9 +7,11 @@ using namespace arma;
 using namespace std;
 
 
-void IsingModel2D::init(int L, double temp){
+void IsingModel2D::init(int L, double temp, int MC){
   // Create mapping vector so that physical mesh points are
   // connected to ghost cells (check that these are int!!!)
+  initialize(L,temp);
+
   m_map = vec(m_L+2);
   m_map(0) = m_L-1;
   m_map(m_L+1) = 0;
@@ -52,7 +54,7 @@ void IsingModel2D::init(int L, double temp){
   }
 }
 
-void IsingModel2D::magnetization(){
+int IsingModel2D::magnetization(){
   /* Code for magnetization for one specific
   state with periodic boundary conditions (2D
 
@@ -62,6 +64,7 @@ void IsingModel2D::magnetization(){
   for (int i = 0; i < m_L*m_L; i++){
     m_magnetization += S(i);
   }
+  return m_magnetization
 }
 
 void IsingModel2D::energy(){
@@ -93,13 +96,11 @@ void IsingModel2D::find_deltaE(int i, int j){
 
 
 void MonteCarlo::expectation_values(){
-
   m_MagneticMoment = 0;
   for (int i = 0; i < L*L; i++){
     magnetization();
-
-
-
+    m_MagneticMoment += abs(m_magnetization)
+  }
 }
 
 void IsingModel2D::specHeat() {
@@ -107,4 +108,5 @@ void IsingModel2D::specHeat() {
 
 
 void IsingModel2D::solve(){
+
 }
