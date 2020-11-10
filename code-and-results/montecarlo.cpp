@@ -49,7 +49,3 @@ void MonteCarlo::monte_carlo(vec S, int i, int j){ // calculates one cycle only
 	  m_MagneticMoment += 2*S(m_map(i)*m_L + m_map(j)); // check why this is like this
 	  m_Energy += m_deltaE; // beregn summen av energi, del til slutt på antall sykluser.
 };
-
-void MonteCarlo::expectation_values(){
-
-}

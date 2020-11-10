@@ -53,7 +53,15 @@ void IsingModel2D::init(int L, double temp){
 }
 
 void IsingModel2D::magnetization(){
+  /* Code for magnetization for one specific
+  state with periodic boundary conditions (2D
 
+  Calculating total magnetization, by summing over all spins
+  for one specific state */
+  m_magnetization = 0;
+  for (int i = 0; i < m_L*m_L; i++){
+    m_magnetization += S(i);
+  }
 }
 
 void IsingModel2D::energy(){
@@ -83,8 +91,20 @@ void IsingModel2D::find_deltaE(int i, int j){
   m_deltaE = getdeltaE(mapping);
 }
 
+
+void MonteCarlo::expectation_values(){
+
+  m_MagneticMoment = 0;
+  for (int i = 0; i < L*L; i++){
+    magnetization();
+
+
+
+}
+
 void IsingModel2D::specHeat() {
 }
+
 
 void IsingModel2D::solve(){
 }
