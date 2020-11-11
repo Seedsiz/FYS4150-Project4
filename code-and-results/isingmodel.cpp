@@ -25,19 +25,14 @@ void IsingModel2D::init(int L, double T, int MC){
     m_map(i+1) = i; // mapping is correct
   }
 
+  // Setting up boltzmann ratio
   m_beta = 1/m_T;
-  getBoltzmann = vec(9); // 5 different energy states: Scale J to 1;
-  getdeltaE = vec(9);
-  getBoltzmann(0) = exp(m_beta*8.0);
-  getBoltzmann(2) = exp(m_beta*4.0);
-  getBoltzmann(4) = 1.0;       //exp(0)
-  getBoltzmann(6) = exp(-m_beta*4.0);
-  getBoltzmann(8) = exp(-m_beta*8.0);
-  getdeltaE(0) = -8.0;
-  getdeltaE(2) = -4.0;
-  getdeltaE(4) = 0.0;
-  getdeltaE(6) = 4.0;
-  getdeltaE(8) = 8.0;
+  getBoltzmann = vec(17); // 5 different energy states: Scale J to 1;
+  getBoltzmann(0) = exp(m_beta*8.0); // boltzmann for deltaE = -8
+  getBoltzmann(4) = exp(m_beta*4.0); // boltzmann for deltaE = -4
+  getBoltzmann(8) = 1.0; //deltaE = 0 exp^0 = 1 // boltzmann for deltaE = 0
+  getBoltzmann(12) = exp(-m_beta*4.0); // boltzmann for deltaE = 4
+  getBoltzmann(16) = exp(-m_beta*8.0); // boltzmann for deltaE = 8
 
   S = vec(L*L);   //Setting up lattice of L*L elements
   draw_acceptance();    //Getting random number
@@ -59,7 +54,7 @@ void IsingModel2D::init(int L, double T, int MC){
       }
     }
   }
-  cout << S << "\n";
+  //cout << S << "\n";
 }
 
 
@@ -83,11 +78,11 @@ int i_p; int j_p;
 int i_pp; int j_pp;   //Same as i_p and j_p only i+1 and j+1
 // Calculating total energy by multiplying below and to the right
 m_Energy = 0.0;
-for (int i = 1; i < m_L+1; i++){
-  for (int j = 1; j < m_L+1; j++){
+for (int i = 1; i <= m_L; i++){
+  for (int j = 1; j <= m_L; j++){
     i_p = m_map(i); j_p = m_map(j); // mapping to physical mesh points
     i_pp = m_map(i+1); j_pp = m_map(j+1); // mapping to physical mesh points
-    m_Energy += S(i_p*m_L+j_p)*S(i_p*m_L+j_pp) + \
+    m_Energy -= S(i_p*m_L+j_p)*S(i_p*m_L+j_pp) + \
         S(i_p*m_L + j_p)*S((i_pp)*m_L + j_p);
     }
   }
@@ -95,17 +90,19 @@ for (int i = 1; i < m_L+1; i++){
 
 void IsingModel2D::find_deltaE(int i, int j){
   // take in suggested random indices
-  // use the sum of spins, then map to a deltaE;
+  // use the sum of sorrounding spins
+  int S_candid =  S(m_map(i)*m_L + m_map(j)); // spin suggested flipped
   int S1 =  S(m_map(i-1)*m_L + m_map(j));
   int S2 =  S(m_map(i+1)*m_L + m_map(j));
   int S3 =  S(m_map(i)*m_L + m_map(j-1));
   int S4 =  S(m_map(i)*m_L + m_map(j+1));
-  int spin_sum = S1 + S2 + S3 + S4;
-  int mapping = spin_sum + 4;
+  m_deltaE = 2*S_candid*(S1 + S2 + S3 + S4);
+  int mapping = m_deltaE + 8;
   m_w = getBoltzmann(mapping); //
-  m_deltaE = getdeltaE(mapping);
+  //cout << "Sc   " << S_candid << "\n";
+  //cout << "sum S  " << (S1 + S2 + S3 + S4) << "\n";
+  //cout << m_deltaE;
   //cout <<"map:"<< mapping << "\n";
-  //cout << "dE: "<< m_deltaE << "\n";
 }
 
 
@@ -122,8 +119,8 @@ vec IsingModel2D::solve(){
   // sends in the indices suggested if metropolis gives true
   // update expectation values and flip
   int m_L2 = m_L*m_L;
-  vec exp_E_cycles = vec(m_MC); //Store mean energy for each cycle
-  vec exp_M_cycles = vec(m_MC); // Store mean magnetic moment each cycle
+  vec E_cycles = vec(m_MC); //Store last energy for each cycle
+  vec M_cycles = vec(m_MC); // Store last magnetic moment each cycle
   vec exp_values = vec(5); // The final expectation values
   m_accepted = vec(m_MC);
 
@@ -135,25 +132,27 @@ vec IsingModel2D::solve(){
   int cumulative_accept = 0;
 
   energy(); // calculate initial energy
+  //cout << "Estart:"<< m_Energy << "\n";
   magnetic_moment(); // calculate initial magnetic moment
   for (int c = 0; c < m_MC; c++){
     for (int i = 0; i < m_L*m_L; i++){
       draw_index();                     //drawing a random index i and j from the lattice S
+      //cout << "i" << m_map(m_rand_i) << "\n";
+      //cout << "j" << m_map(m_rand_j) << "\n"; mapping works correctly
+
       find_deltaE(m_rand_i, m_rand_j);  //calculating deltaE and m_w for flip of the random indices
       metropolis(m_w);                 //returns true or false, given deltaE
       if (m_cont == true){  // !!! Uncertain if this if statement needs to be here (could have only one)
-    	  m_Energy += S(m_map(m_rand_i)*m_L + m_map(m_rand_j))*m_deltaE; // Calculating mean expectation value of cycle, get right sign
-        cumulative_accept += 1;
+    	  m_Energy += m_deltaE; // Calculating value of cycle
         S(m_map(m_rand_i)*m_L + m_map(m_rand_j)) *= -1.0;    // if true, flip one spin and accept new spin config
     	  m_MagneticMoment += 2*S(m_map(m_rand_i)*m_L + m_map(m_rand_j)); // check why this is like this
-        //cout << m_deltaE << "\n";
-        //cout << m_Energy << "\n"; <--- Something is wrong here: only increases negatively
-
+        cumulative_accept += 1;
+        //cout << "dE" << m_deltaE << "\n";
         }
       }
-    // first store expectation value for this cycle
-    exp_E_cycles(c) = m_Energy;
-    exp_M_cycles(c) = m_MagneticMoment;
+    // first store endpoint energy value for this cycle
+    E_cycles(c) = m_Energy;
+    M_cycles(c) = m_MagneticMoment;
 
     //adding expectation values from each cycle
     exp_val_E += m_Energy;
@@ -185,11 +184,15 @@ vec IsingModel2D::solve(){
 
   //cout << setprecision(15) << ((double) 1/m_L2)*exp_values << "\n";
   //cout << m_accepted;
-  cout << exp_E_cycles; //
-  //cout << exp_M_cycles;
+  //cout << E_cycles; //
+  //cout << M_cycles;
 
   // Scaling by L^2 spins because m_L is an intrinsic parameter
-  exp_E_cycles = ((double) 1/m_L2)*exp_E_cycles;
-  exp_M_cycles = ((double) 1/m_L2)*exp_M_cycles;
+  E_cycles = ((double) 1/m_L2)*E_cycles;
+  M_cycles = ((double) 1/m_L2)*M_cycles;
   return ((double) 1/m_L2)*exp_values;
+}
+
+void IsingModel2D::write_exp_vals_to_file(){
+
 }

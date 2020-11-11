@@ -20,7 +20,7 @@ protected:
   vec m_map; // a mapping instead of ghost cells
   vec getBoltzmann; // A vector containing boltzmann (deltaEs)
   vec getdeltaE;    // Used to add delta E (get m_deltaE) to Energy in monte carlo cycle
-  double m_deltaE; // actual change in energy
+  double m_deltaE; // actual change in energy, store as int?
   double m_w; // The boltzmann ratio gotten from getBoltzmann
   double m_beta; // m_beta = 1/m_T
   bool m_cont; // continue factor in metropolis algo
@@ -31,6 +31,7 @@ protected:
   double exp_val_M, exp_val_M2;  //expectation values for magnetization and magnetization squared
   double exp_val_Mabs;   //expectation value for mean absolute value of magnetization
   double m_Cv, m_xi;    //specific heat and susceptibility
+  int m_sign; // To get right boltzmann factor and deltaE
 
 public:
   void initialize(int L, double T);
@@ -54,5 +55,6 @@ public:
   void find_deltaE(int flip_i, int flip_j);
   void specHeat();
   vec solve();
+  void write_exp_vals_to_file();
 };
 #endif
