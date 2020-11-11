@@ -7,15 +7,18 @@ using namespace arma;
 using namespace std;
 
 
-void IsingModel2D::init(int L, double temp, int MC){
+void IsingModel2D::init(int L, double T, int MC){
   // Create mapping vector so that physical mesh points are
   // connected to ghost cells (check that these are int!!!)
-  initialize(L,temp);
-
+  //initialize(L,temp);
+  m_T = T;
+  m_L = L;
+  m_MC = MC;
   m_map = vec(m_L+2);
   m_map(0) = m_L-1;
   m_map(m_L+1) = 0;
-  m_T = temp;
+
+
   for (int i = 0; i <= m_L; i++){
     m_map(i+1) = i;
   }
@@ -26,10 +29,12 @@ void IsingModel2D::init(int L, double temp, int MC){
   getBoltzmann(0) = exp(-8.0);
   getBoltzmann(2) = exp(-4.0);
   getBoltzmann(4) = 1.0;       //exp(0)
+  getBoltzmann(6) = exp(4.0);
   getBoltzmann(8) = exp(8.0);
   getdeltaE(0) = -8.0;
   getdeltaE(2) = -4.0;
   getdeltaE(4) = 0.0;
+  getdeltaE(6) = 4.0;
   getdeltaE(8) = 8.0;
 
   S = vec(L*L);   //Setting up lattice of L*L elements
@@ -54,17 +59,17 @@ void IsingModel2D::init(int L, double temp, int MC){
   }
 }
 
-int IsingModel2D::magnetization(){
+int IsingModel2D::magnetic_moment(){
   /* Code for magnetization for one specific
   state with periodic boundary conditions (2D
 
   Calculating total magnetization, by summing over all spins
   for one specific state */
-  m_magnetization = 0;
+  m_MagneticMoment = 0;
   for (int i = 0; i < m_L*m_L; i++){
-    m_magnetization += S(i);
+    m_MagneticMoment += S(i);
   }
-  return m_magnetization
+  return m_MagneticMoment;
 }
 
 void IsingModel2D::energy(){
@@ -97,12 +102,8 @@ void IsingModel2D::find_deltaE(int i, int j){
 }
 
 
-void MonteCarlo::expectation_values(){
-  m_MagneticMoment = 0;
-  for (int i = 0; i < L*L; i++){
-    magnetization();
-    m_MagneticMoment += abs(m_magnetization)
-  }
+void IsingModel2D::expectation_values(){
+
 }
 
 void IsingModel2D::specHeat() {
@@ -110,5 +111,43 @@ void IsingModel2D::specHeat() {
 
 
 void IsingModel2D::solve(){
+  // calculates one cycle only
+  // sends in the indices suggested if metropolis gives true
+  // update expectation values and flip
+  energy();
+  //magnetic_moment();
+  /*
+  for (int c = 0; c < m_MC; c++){
+    for (int i = 0; i < m_L*m_L; i++){
+      draw_index();                     //drawing a random index i and j from the lattice S
+      find_deltaE(m_rand_i, m_rand_j);  //calculating deltaE and m_w
+      metropolis(m_w);                 //returns true or false
+      if (m_cont == true){  //usikker på om vi skal ha denne eller ikke
+        S(m_map(m_rand_i)*m_L + m_map(m_rand_j)) *= -1.0;    // flip one spin and accept new spin config
+    	  m_MagneticMoment += 2*S(m_map(m_rand_i)*m_L + m_map(m_rand_j)); // check why this is like this
+    	  m_Energy += m_deltaE; // beregn summen av energi, del til slutt på antall sykluser.
+      }
+    }
+    //beregn expectation values
+    //dividing by number of spins because m_L is an intrinsic parameter????
+    exp_val_E += m_Energy;
+    exp_val_E2 += m_Energy*m_Energy;
+    exp_val_M += m_MagneticMoment;
+    exp_val_M2 += m_MagneticMoment*m_MagneticMoment;
+    exp_val_Mabs += fabs(m_MagneticMoment);
+  }
+  //Dividing the resulting expectation values with number of MC cycles m_MC
+  exp_val_E = exp_val_E/((double) (m_MC));   //divide by number of MC cycles?????
+  exp_val_E2 = exp_val_E2/((double) (m_MC));
+  exp_val_M = exp_val_M/((double) (m_MC));
+  exp_val_M2 = exp_val_M2/((double) (m_MC));
+  exp_val_Mabs = exp_val_Mabs/((double) (m_MC));
+
+  //Calculating variance for energy and magnetization
+  //Finding specific heat m_Cv and suceptibility m_xi
+  double varianceE = exp_val_E2 - exp_val_E*exp_val_E;
+  double varianceM = exp_val_M2 - exp_val_M*exp_val_M;
+  m_Cv = varianceE/(m_T*m_T);
+  m_xi = varianceM/m_T;*/
 
 }

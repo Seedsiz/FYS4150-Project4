@@ -12,6 +12,7 @@ class MonteCarlo{
 protected:
   int m_L; // number of grid points (spin particles) // move these two maybe
   int m_T; //temperature
+  int m_MC; //number of monte carlo cycles
   int m_rand_i; // the random index to draw
   int m_rand_j; // the random index to draw
   double m_check; // the random r in [0,1] acceptance criteria
@@ -25,6 +26,10 @@ protected:
   double m_Energy; // total energy of the system
   double m_MagneticMoment; // magnetic moment M
   vec S;     //lattice converted to a flat array
+  double exp_val_E, exp_val_E2;  //expectation values for energy and energy squared
+  double exp_val_M, exp_val_M2;  //expectation values for magnetization and magnetization squared
+  double exp_val_Mabs;   //expectation value for mean absolute value of magnetization
+  double m_Cv, m_xi;    //specific heat and suceptibility
 
 public:
   void initialize(int L, double T);
@@ -41,8 +46,9 @@ protected:
   vec S; // A vector containing all spins; must be initalized in a random state
 
 public:
-  void init(int L, double temp, int MC);
-  void magnetization();
+  void init(int L, double T, int MC);
+  int magnetic_moment();
+  void expectation_values();
   void energy();
   void find_deltaE(int flip_i, int flip_j);
   void specHeat();
