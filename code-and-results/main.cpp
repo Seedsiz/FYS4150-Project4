@@ -31,5 +31,7 @@ void menu(){
   //mysolver.draw_acceptance();
   IsingModel2D model;
   model.init(L, T, MC);
-  //model.solve();
+  model.solve();
+
+  //Catch::Session().run();
 }

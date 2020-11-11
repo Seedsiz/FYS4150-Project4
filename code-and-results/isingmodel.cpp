@@ -19,7 +19,7 @@ void IsingModel2D::init(int L, double T, int MC){
   m_map(m_L+1) = 0;
 
 
-  for (int i = 0; i <= m_L; i++){
+  for (int i = 0; i < m_L; i++){
     m_map(i+1) = i;
   }
   // remember to cout to see if this is correct
@@ -78,8 +78,9 @@ state with periodic boundary conditions (2D) */
 int i_p; int j_p;
 int i_pp; int j_pp;   //Same as i_p and j_p only i+1 and j+1
 // Calculating total energy by multiplying below and to the right
-for (int i = 1; i <= m_L+1; i++){
-  for (int j = 1; j <= m_L+1; j++){
+m_Energy = 0.0;
+for (int i = 1; i < m_L+1; i++){
+  for (int j = 1; j < m_L+1; j++){
     i_p = m_map(i); j_p = m_map(j); // mapping to physical mesh points
     i_pp = m_map(i+1); j_pp = m_map(j+1); // mapping to physical mesh points
     m_Energy += S(i_p*m_L+j_p)*S(i_p*m_L+j_pp) + \
@@ -110,13 +111,12 @@ void IsingModel2D::specHeat() {
 }
 
 
-void IsingModel2D::solve(){
+vec IsingModel2D::solve(){
   // calculates one cycle only
   // sends in the indices suggested if metropolis gives true
   // update expectation values and flip
   energy();
-  //magnetic_moment();
-  /*
+  magnetic_moment();
   for (int c = 0; c < m_MC; c++){
     for (int i = 0; i < m_L*m_L; i++){
       draw_index();                     //drawing a random index i and j from the lattice S
@@ -137,17 +137,23 @@ void IsingModel2D::solve(){
     exp_val_Mabs += fabs(m_MagneticMoment);
   }
   //Dividing the resulting expectation values with number of MC cycles m_MC
-  exp_val_E = exp_val_E/((double) (m_MC));   //divide by number of MC cycles?????
+  vec exp_values = vec(5);
+  exp_values(0) = exp_val_E/((double) (m_MC));    //divide by number of MC cycles?????
+  exp_values(1) = exp_val_M/((double) (m_MC));
+  exp_values(2) = exp_val_Mabs/((double) (m_MC));
+
   exp_val_E2 = exp_val_E2/((double) (m_MC));
-  exp_val_M = exp_val_M/((double) (m_MC));
   exp_val_M2 = exp_val_M2/((double) (m_MC));
-  exp_val_Mabs = exp_val_Mabs/((double) (m_MC));
 
   //Calculating variance for energy and magnetization
   //Finding specific heat m_Cv and suceptibility m_xi
-  double varianceE = exp_val_E2 - exp_val_E*exp_val_E;
-  double varianceM = exp_val_M2 - exp_val_M*exp_val_M;
+  double varianceE = exp_val_E2 - exp_values(0)*exp_values(0);
+  double varianceM = exp_val_M2 - exp_values(1)*exp_values(1);
   m_Cv = varianceE/(m_T*m_T);
-  m_xi = varianceM/m_T;*/
+  m_xi = varianceM/m_T;
+  exp_values(3) = m_Cv;
+  exp_values(4) = m_xi;
 
+  cout << exp_values(0) << "\n";
+  return exp_values;
 }

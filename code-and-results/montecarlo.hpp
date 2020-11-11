@@ -52,6 +52,6 @@ public:
   void energy();
   void find_deltaE(int flip_i, int flip_j);
   void specHeat();
-  void solve();
+  vec solve();
 };
 #endif
