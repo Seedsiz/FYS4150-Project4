@@ -19,7 +19,6 @@ protected:
   double m_check; // the random r in [0,1] acceptance criteria
   vec m_map; // a mapping instead of ghost cells
   vec getBoltzmann; // A vector containing boltzmann (deltaEs)
-  vec getdeltaE;    // Used to add delta E (get m_deltaE) to Energy in monte carlo cycle
   double m_deltaE; // actual change in energy, store as int?
   double m_w; // The boltzmann ratio gotten from getBoltzmann
   double m_beta; // m_beta = 1/m_T
