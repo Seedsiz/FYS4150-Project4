@@ -29,7 +29,7 @@ protected:
   double exp_val_E, exp_val_E2;  //expectation values for energy and energy squared
   double exp_val_M, exp_val_M2;  //expectation values for magnetization and magnetization squared
   double exp_val_Mabs;   //expectation value for mean absolute value of magnetization
-  double m_Cv, m_xi;    //specific heat and suceptibility
+  double m_Cv, m_xi;    //specific heat and susceptibility
 
 public:
   void initialize(int L, double T);

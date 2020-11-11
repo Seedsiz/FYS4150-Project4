@@ -2,6 +2,7 @@
 
 #include <armadillo>
 #include <iostream>
+#include <iomanip>
 
 using namespace arma;
 using namespace std;
@@ -11,18 +12,18 @@ void IsingModel2D::init(int L, double T, int MC){
   // Create mapping vector so that physical mesh points are
   // connected to ghost cells (check that these are int!!!)
   //initialize(L,temp);
-  m_T = T;
-  m_L = L;
-  m_MC = MC;
+  m_T = T; // temperature
+  m_L = L; // number of spins along a given axis (square 2D system)
+  m_MC = MC; // number of Monte carlo cycles
   m_map = vec(m_L+2);
-  m_map(0) = m_L-1;
-  m_map(m_L+1) = 0;
+  m_map(0) = m_L-1; // first index in map --> last index in physical mesh
+  m_map(m_L+1) = 0; // last index in map --> first index in physical mesh
 
 
   for (int i = 0; i < m_L; i++){
-    m_map(i+1) = i;
+    m_map(i+1) = i; // mapping is correct
   }
-  // remember to cout to see if this is correct
+
   m_beta = 1/m_T;
   getBoltzmann = vec(9); // 5 different energy states: Scale J to 1;
   getdeltaE = vec(9);
@@ -115,35 +116,48 @@ vec IsingModel2D::solve(){
   // calculates one cycle only
   // sends in the indices suggested if metropolis gives true
   // update expectation values and flip
-  energy();
-  magnetic_moment();
+  int m_L2 = m_L*m_L;
+  vec exp_E_cycles = vec(m_MC); //Store mean energy for each cycle
+  vec exp_M_cycles = vec(m_MC); // Store mean magnetic moment each cycle
+  vec exp_values = vec(5); // The final expectation values
+
+  // Initialize to zero
+  exp_val_E = 0; exp_val_E2 = 0;
+  exp_val_M = 0; exp_val_M2 = 9;
+  exp_val_Mabs = 0;
+
+  energy(); // calculate initial energy
+  magnetic_moment(); // calculate initial magnetic moment
   for (int c = 0; c < m_MC; c++){
     for (int i = 0; i < m_L*m_L; i++){
       draw_index();                     //drawing a random index i and j from the lattice S
-      find_deltaE(m_rand_i, m_rand_j);  //calculating deltaE and m_w
-      metropolis(m_w);                 //returns true or false
-      if (m_cont == true){  //usikker på om vi skal ha denne eller ikke
-        S(m_map(m_rand_i)*m_L + m_map(m_rand_j)) *= -1.0;    // flip one spin and accept new spin config
+      find_deltaE(m_rand_i, m_rand_j);  //calculating deltaE and m_w for flip of the random indices
+      metropolis(m_w);                 //returns true or false, given deltaE
+      if (m_cont == true){  // !!! Uncertain if this if statement needs to be here (could have only one)
+        S(m_map(m_rand_i)*m_L + m_map(m_rand_j)) *= -1.0;    // if true, flip one spin and accept new spin config
     	  m_MagneticMoment += 2*S(m_map(m_rand_i)*m_L + m_map(m_rand_j)); // check why this is like this
     	  m_Energy += m_deltaE; // beregn summen av energi, del til slutt på antall sykluser.
       }
     }
-    //beregn expectation values
-    //dividing by number of spins because m_L is an intrinsic parameter????
+    // first store expectation value for this cycle
+    exp_E_cycles(c) = m_Energy;
+    exp_M_cycles(c) = m_MagneticMoment;
+
+    //adding expectation values for each cycle
     exp_val_E += m_Energy;
     exp_val_E2 += m_Energy*m_Energy;
     exp_val_M += m_MagneticMoment;
     exp_val_M2 += m_MagneticMoment*m_MagneticMoment;
     exp_val_Mabs += fabs(m_MagneticMoment);
   }
-  //Dividing the resulting expectation values with number of MC cycles m_MC
-  vec exp_values = vec(5);
-  exp_values(0) = exp_val_E/((double) (m_MC));    //divide by number of MC cycles?????
-  exp_values(1) = exp_val_M/((double) (m_MC));
-  exp_values(2) = exp_val_Mabs/((double) (m_MC));
+  //Get final expectation value over all cycles: Dividing the sum with number
+  //of MC cycles m_MC to get expectation values.
+  exp_values(0) = exp_val_E/m_MC;
+  exp_values(1) = exp_val_M/m_MC;
+  exp_values(2) = exp_val_Mabs/m_MC;
 
-  exp_val_E2 = exp_val_E2/((double) (m_MC));
-  exp_val_M2 = exp_val_M2/((double) (m_MC));
+  exp_val_E2 = exp_val_E2/m_MC;
+  exp_val_M2 = exp_val_M2/m_MC;
 
   //Calculating variance for energy and magnetization
   //Finding specific heat m_Cv and suceptibility m_xi
@@ -154,6 +168,9 @@ vec IsingModel2D::solve(){
   exp_values(3) = m_Cv;
   exp_values(4) = m_xi;
 
-  cout << exp_values(0) << "\n";
-  return exp_values;
+  cout << std::setprecision(15) << ((double) 1/m_L2)*exp_values << "\n";
+  // Scaling by L^2 spins because m_L is an intrinsic parameter
+  exp_E_cycles = ((double) 1/m_L2)*exp_E_cycles;
+  exp_M_cycles = ((double) 1/m_L2)*exp_M_cycles;
+  return ((double) 1/m_L2)*exp_values;
 }
