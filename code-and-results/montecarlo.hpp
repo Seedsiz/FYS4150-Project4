@@ -11,7 +11,8 @@ class MonteCarlo{
 
 protected:
   int m_L; // number of grid points (spin particles) // move these two maybe
-  int m_T; //temperature
+  vec m_accepted; // cumulative number of accepted spins
+  double m_T; //temperature
   int m_MC; //number of monte carlo cycles
   int m_rand_i; // the random index to draw
   int m_rand_j; // the random index to draw
