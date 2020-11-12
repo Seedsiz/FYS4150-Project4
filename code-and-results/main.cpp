@@ -14,7 +14,7 @@ int main(int argc, char const *argv[]){
 }
 
 void menu(){
-  int L;
+  /*int L;
   int MC;
   double T;
   cout << "Enter integer number of spin particles for each axis:" << " ";
@@ -31,7 +31,7 @@ void menu(){
   //mysolver.draw_acceptance();
   IsingModel2D model;
   model.init(L, T, MC);
-  model.solve();
+  model.solve();*/
 
-  //Catch::Session().run();
+  Catch::Session().run();
 }

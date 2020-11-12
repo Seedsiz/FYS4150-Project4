@@ -26,24 +26,22 @@ TEST_CASE("Testing expectation values") {
 
   double z = 12. + 4*cosh(8*T);
   double exp_E = -(32./z)*sinh(8*B);
-  double mean_abs_M = (double) (3/2);
+  double mean_abs_M = (8./z)*(exp(8*B) + 2);
   double Cv = ((double) 256/(T*T*z))*(cosh(8*B) - (4/z)*sinh(8*B)*sinh(8*B));
   double xi = ((double) 32/(T*z))*(exp(8*B) + 1);
 
   vec exact = vec(4);
   exact(0) = exp_E/(L*L);
-  exact(1) = mean_abs_M;
-  exact(2) = Cv;
-  exact(3) = xi;
+  exact(1) = mean_abs_M/(L*L);
+  exact(2) = Cv/(L*L);
+  exact(3) = xi/(L*L);
 
-  cout << exact(0) << "\n";
-  cout << num_val(0) << "\n";
 
-  /*double tol = 1E-04;
+  //double tol = 1E-04;
 
   for(int i = 0; i < 4; i++) {
     cout << num_val[i] << " " << exact[i] << "\n";
     //REQUIRE((num_val[i] - exact[i]) < tol);
-  }*/
+  }
 
 }
