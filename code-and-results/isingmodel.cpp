@@ -25,17 +25,8 @@ void IsingModel2D::init(int L, double T_start, double T_end, int n_T, int MC){
     m_map(i+1) = i; // mapping is correct
   }
 
-  // Setting up boltzmann ratio
-  getBoltzmann = zeros<mat>(m_nT,17); // set
-  // 5 different energy states: Scale J to 1;
-  for (int i = 0; i < m_nT; i++){
-    m_beta = 1/((double) m_T(i));
-    getBoltzmann(i,0) = exp(m_beta*8.0); // boltzmann for deltaE = -8
-    getBoltzmann(i,4) = exp(m_beta*4.0); // boltzmann for deltaE = -4
-    getBoltzmann(i,8) = 1.0; //deltaE = 0 exp^0 = 1 // boltzmann for deltaE = 0
-    getBoltzmann(i,12) = exp(-m_beta*4.0); // boltzmann for deltaE = 4
-    getBoltzmann(i,16) = exp(-m_beta*8.0); // boltzmann for deltaE = 8
-  }
+  // Setting up boltzmann ratio vector
+  getBoltzmann = zeros<vec>(17);
 
   S = vec(L*L);   //Setting up lattice of L*L elements
   draw_acceptance();    //Getting random number
@@ -60,6 +51,15 @@ void IsingModel2D::init(int L, double T_start, double T_end, int n_T, int MC){
   //cout << S << "\n";
 }
 
+void IsingModel2D::setup_boltzmann_ratio(int temp_i){ // function to call for each temp
+  // 5 different energy states: Scale J to 1;
+    m_beta = 1/((double) m_T(temp_i));
+    getBoltzmann(0) = exp(m_beta*8.0); // boltzmann for deltaE = -8
+    getBoltzmann(4) = exp(m_beta*4.0); // boltzmann for deltaE = -4
+    getBoltzmann(8) = 1.0; //deltaE = 0 exp^0 = 1 // boltzmann for deltaE = 0
+    getBoltzmann(12) = exp(-m_beta*4.0); // boltzmann for deltaE = 4
+    getBoltzmann(16) = exp(-m_beta*8.0); // boltzmann for deltaE = 8
+}
 
 int IsingModel2D::magnetic_moment(){
   /* Code for magnetization for one specific
@@ -101,7 +101,7 @@ void IsingModel2D::find_deltaE(int temp_i,int i, int j){
   int S4 =  S(m_map(i)*m_L + m_map(j+1));
   m_deltaE = 2*S_candid*(S1 + S2 + S3 + S4);
   int mapping = m_deltaE + 8;
-  m_w = getBoltzmann(temp_i,mapping); //
+  m_w = getBoltzmann(mapping); //
   //cout << "Sc   " << S_candid << "\n";
   //cout << "sum S  " << (S1 + S2 + S3 + S4) << "\n";
   //cout << m_deltaE;
@@ -153,7 +153,10 @@ vec IsingModel2D::solve(){
   energy(); // calculate initial energy
   //cout << "Estart:"<< m_Energy << "\n";
   magnetic_moment(); // calculate initial magnetic moment
+
   for (int temp = 0; temp < m_nT; temp++){
+    cout << temp;
+    setup_boltzmann_ratio(temp); // get right beta = 1/T
     for (int c = 0; c < m_MC; c++){
       for (int i = 0; i < m_L*m_L; i++){
         m_rand_i =  distribution_i(gen_i); // Draw index i on physical mesh, suggest flip
@@ -205,19 +208,18 @@ vec IsingModel2D::solve(){
 
       //cout << setprecision(15) << ((double) 1/m_L2)*exp_values << "\n";
       //cout << m_accepted;
-      //cout << E_cycles; //
+      cout << E_cycles; //
       //cout << M_cycles;
 
       // Scaling by L^2 spins because m_L is an intrinsic parameter
       E_cycles = ((double) 1/m_L2)*E_cycles;
       M_cycles = ((double) 1/m_L2)*M_cycles;
   }
-  return ((double) 1/m_L2)*exp_values; // return something
+  return ((double) 1/m_L2)*exp_values; // return something/or just write to file above?
 }
 
-
-
-
 void IsingModel2D::write_exp_vals_to_file(){
-
+  // write energies, magnetization, number of MC cycles,  to file
+  // write in the end expectation values to file
+  // post-process these in python.
 }

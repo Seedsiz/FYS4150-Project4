@@ -22,16 +22,15 @@ void menu(){
 
   cout << "Enter integer number of spin particles for each axis:" << " ";
   cin >> L;
-  cout << "Enter integer number of MC cycles:"  << " ";
-  cin >> MC;
   cout << "Enter start point temperature:"  << " ";
   cin >> T_start;
   cout << "Enter an endpoint temperature:"  << " ";
   cin >> T_end;
   cout << "Enter integer number of temperature points to be evaluated:"  << " ";
   cin >> n_T;
+  cout << "Enter integer number of MC cycles:"  << " ";
+  cin >> MC;
 
-  /*
   //Tryout random generator
   //MonteCarlo mysolver;
   //mysolver.initialize(L,T);
@@ -42,5 +41,5 @@ void menu(){
   model.solve();
 
   //Catch::Session().run();
-  */
+
 }

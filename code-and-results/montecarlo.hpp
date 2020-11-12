@@ -19,7 +19,7 @@ protected:
   int m_rand_j; // the random index to draw
   double m_check; // the random r in [0,1] acceptance criteria
   vec m_map; // a mapping instead of ghost cells
-  mat getBoltzmann; // A vector containing boltzmann (deltaEs)
+  vec getBoltzmann; // A vector containing boltzmann (deltaEs)
   double m_deltaE; // actual change in energy, store as int?
   double m_w; // The boltzmann ratio gotten from getBoltzmann
   double m_beta; // m_beta = 1/m_T
@@ -49,6 +49,7 @@ protected:
 
 public:
   void init(int L, double T_start, double T_end, int n_T, int MC);
+  void setup_boltzmann_ratio(int tempi);
   int magnetic_moment();
   void expectation_values();
   void energy();
