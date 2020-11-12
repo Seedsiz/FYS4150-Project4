@@ -12,6 +12,7 @@ class MonteCarlo{
 protected:
   int m_nT; // number of temperatures to loop over
   int m_L; // number of grid points (spin particles) // move these two maybe
+  int m_L2;
   vec m_accepted; // cumulative number of accepted spins
   vec m_T; // vector with temperatures to loop over
   int m_MC; //number of monte carlo cycles
@@ -56,6 +57,7 @@ public:
   void find_deltaE(int tempi, int flip_i, int flip_j);
   void specHeat();
   vec solve();
-  void write_exp_vals_to_file();
+  void open_exp_vals_to_file(ofstream&file);
+  void write_exp_vals_to_file(vec expval,ofstream &file, int temp);
 };
 #endif

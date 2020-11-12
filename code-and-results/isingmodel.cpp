@@ -121,7 +121,7 @@ vec IsingModel2D::solve(){
   // calculates all cycles
   // sends in the indices suggested if metropolis gives true
   // update expectation values and flip
-  int m_L2 = m_L*m_L;
+  m_L2 = m_L*m_L;
   vec E_cycles = vec(m_MC); //Store last energy for each cycle
   vec M_cycles = vec(m_MC); // Store last magnetic moment each cycle
   vec exp_values = vec(5); // The final expectation values
@@ -154,8 +154,11 @@ vec IsingModel2D::solve(){
   //cout << "Estart:"<< m_Energy << "\n";
   magnetic_moment(); // calculate initial magnetic moment
 
+  ofstream myfile; // initiate write to file
+  open_exp_vals_to_file(myfile); // opens file to be written
+
   for (int temp = 0; temp < m_nT; temp++){
-    cout << temp;
+    //cout << temp;
     setup_boltzmann_ratio(temp); // get right beta = 1/T
     for (int c = 0; c < m_MC; c++){
       for (int i = 0; i < m_L*m_L; i++){
@@ -214,12 +217,30 @@ vec IsingModel2D::solve(){
       // Scaling by L^2 spins because m_L is an intrinsic parameter
       E_cycles = ((double) 1/m_L2)*E_cycles;
       M_cycles = ((double) 1/m_L2)*M_cycles;
+      exp_values = ((double) 1/m_L2)*exp_values;
+
+      write_exp_vals_to_file(exp_values,myfile,temp);
   }
-  return ((double) 1/m_L2)*exp_values; // return something/or just write to file above?
+  myfile.close();
+  return exp_values; // return something/or just write to file above?
 }
 
-void IsingModel2D::write_exp_vals_to_file(){
+void IsingModel2D::open_exp_vals_to_file(ofstream&file){
+  string filename("./Results/exp_values/expvalues.txt");
+  file.open(filename);
+  file    << setprecision(8) << "Temp" << setw(20) << "MC_cycles" << setw(20) << "N_spins" << setw(20)\
+          << "<E>/N" << setw(20) << "<M>/N" << setw(20) <<  "<|M|>/N" << setw(20) \
+          << "Cv" << setw(20) << "Xi";
+  file << "\n";
+}
+
+void IsingModel2D::write_exp_vals_to_file(vec expval,ofstream&file, int temp){
   // write energies, magnetization, number of MC cycles,  to file
   // write in the end expectation values to file
   // post-process these in python.
+  file    << setprecision(8) << m_T(temp) << setw(20) << m_MC << setw(20) << m_L2 << setw(20)\
+          << expval(0) << setw(20) << expval(1) << setw(20) <<  expval(2) << setw(20) \
+          << expval(3) << setw(20) << expval(4);
+  file << "\n";
+
 }
