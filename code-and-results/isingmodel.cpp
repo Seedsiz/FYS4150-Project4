@@ -91,7 +91,7 @@ for (int i = 1; i <= m_L; i++){
   }
 }
 
-void IsingModel2D::find_deltaE(int i, int j){
+void IsingModel2D::find_deltaE(int temp_i,int i, int j){
   // take in suggested random indices
   // use the sum of sorrounding spins
   int S_candid =  S(m_map(i)*m_L + m_map(j)); // spin suggested flipped
@@ -101,7 +101,7 @@ void IsingModel2D::find_deltaE(int i, int j){
   int S4 =  S(m_map(i)*m_L + m_map(j+1));
   m_deltaE = 2*S_candid*(S1 + S2 + S3 + S4);
   int mapping = m_deltaE + 8;
-  m_w = getBoltzmann(mapping); //
+  m_w = getBoltzmann(temp_i,mapping); //
   //cout << "Sc   " << S_candid << "\n";
   //cout << "sum S  " << (S1 + S2 + S3 + S4) << "\n";
   //cout << m_deltaE;
@@ -158,7 +158,7 @@ vec IsingModel2D::solve(){
       for (int i = 0; i < m_L*m_L; i++){
         m_rand_i =  distribution_i(gen_i); // Draw index i on physical mesh, suggest flip
         m_rand_j =  distribution_j(gen_j); // Draw index j on physical mesh, suggest flip
-        find_deltaE(m_rand_i, m_rand_j);  //calculating deltaE and m_w for flip of the random indices
+        find_deltaE(temp, m_rand_i, m_rand_j);  //calculating deltaE and m_w for flip of the random indices
 
         m_check =  distribution(gen);    // draw acceptance criteria
         metropolis(m_w);                 //returns true or false, given deltaE

@@ -52,7 +52,7 @@ public:
   int magnetic_moment();
   void expectation_values();
   void energy();
-  void find_deltaE(int flip_i, int flip_j);
+  void find_deltaE(int tempi, int flip_i, int flip_j);
   void specHeat();
   vec solve();
   void write_exp_vals_to_file();
