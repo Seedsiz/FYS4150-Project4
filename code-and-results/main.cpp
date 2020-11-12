@@ -19,7 +19,7 @@ void menu(){
   int L; int MC;
   double T_start, T_end;
   int n_T;
-
+  /*
   cout << "Enter integer number of spin particles for each axis:" << " ";
   cin >> L;
   cout << "Enter start point temperature:"  << " ";
@@ -39,7 +39,8 @@ void menu(){
   IsingModel2D model;
   model.init(L, T_start,T_end, n_T, MC);
   model.solve();
+  */
 
-  //Catch::Session().run();
+  Catch::Session().run();
 
 }

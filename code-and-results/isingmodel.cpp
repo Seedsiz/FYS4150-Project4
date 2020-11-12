@@ -211,7 +211,7 @@ vec IsingModel2D::solve(){
 
       //cout << setprecision(15) << ((double) 1/m_L2)*exp_values << "\n";
       //cout << m_accepted;
-      cout << E_cycles; //
+      //cout << E_cycles; //
       //cout << M_cycles;
 
       // Scaling by L^2 spins because m_L is an intrinsic parameter
