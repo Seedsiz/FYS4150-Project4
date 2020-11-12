@@ -115,7 +115,7 @@ void IsingModel2D::specHeat() {
 
 
 vec IsingModel2D::solve(){
-  // calculates one cycle only
+  // calculates all cycles
   // sends in the indices suggested if metropolis gives true
   // update expectation values and flip
   int m_L2 = m_L*m_L;
@@ -131,17 +131,34 @@ vec IsingModel2D::solve(){
   exp_val_Mabs = 0;
   int cumulative_accept = 0;
 
+    /* Mersenne twister random generator suggest
+      flipping of spin with random index. PS: indices are thereafter mapped;
+      */ // seed once in the beginning
+    int rd = chrono::high_resolution_clock::now().time_since_epoch().count(); //+ rank <--  for parallellization;
+    mt19937_64 gen_i(rd);      // seeded with rd
+    uniform_int_distribution<> distribution_i(1, (m_L)); // Choose uniform distr. with range 1,(m_L) (unsigned integer)
+
+    int sd = chrono::high_resolution_clock::now().time_since_epoch().count(); //+ rank <--  for parallellization;
+    mt19937_64 gen_j(sd);     // seeded with sd
+    uniform_int_distribution<> distribution_j(1, (m_L)); // Choose uniform distr. with range 1,(m_L)
+
+    /*random number between [0,1); seed once */
+    int td = chrono::high_resolution_clock::now().time_since_epoch().count(); // Used to obtain seed
+    mt19937_64 gen(td);                                                       // seeded with sd
+    uniform_real_distribution<double> distribution(0.0,1.0);                  // creates [0,1)
+
   energy(); // calculate initial energy
   //cout << "Estart:"<< m_Energy << "\n";
   magnetic_moment(); // calculate initial magnetic moment
   for (int c = 0; c < m_MC; c++){
     for (int i = 0; i < m_L*m_L; i++){
-      draw_index();                     //drawing a random index i and j from the lattice S
-      //cout << "i" << m_map(m_rand_i) << "\n";
-      //cout << "j" << m_map(m_rand_j) << "\n"; mapping works correctly
-
+      m_rand_i =  distribution_i(gen_i); // Draw index i on physical mesh, suggest flip
+      m_rand_j =  distribution_j(gen_j); // Draw index j on physical mesh, suggest flip
       find_deltaE(m_rand_i, m_rand_j);  //calculating deltaE and m_w for flip of the random indices
+
+      m_check =  distribution(gen);    // draw acceptance criteria
       metropolis(m_w);                 //returns true or false, given deltaE
+
       if (m_cont == true){  // !!! Uncertain if this if statement needs to be here (could have only one)
     	  m_Energy += m_deltaE; // Calculating value of cycle
         S(m_map(m_rand_i)*m_L + m_map(m_rand_j)) *= -1.0;    // if true, flip one spin and accept new spin config

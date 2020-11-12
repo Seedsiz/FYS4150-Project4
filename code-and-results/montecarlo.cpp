@@ -14,7 +14,7 @@ void MonteCarlo::draw_index(){ // random number generator;
   /* Mersenne twister random generator suggest
     flipping of spin with random index PS: indices needs to be mapped;
     */
-  int rd = chrono::high_resolution_clock::now().time_since_epoch().count(); //+ rank <--  for parallellization;
+  /*int rd = chrono::high_resolution_clock::now().time_since_epoch().count(); //+ rank <--  for parallellization;
   mt19937_64 gen_i(rd);      // seeded with rd
   uniform_int_distribution<> distribution_i(1, (m_L)); // Choose uniform distr. with range 1,(m_L-1) (unsigned integer)
   m_rand_i =  distribution_i(gen_i); // Draw index, flip this  (PS, needs to call for both i and j values)
@@ -24,6 +24,7 @@ void MonteCarlo::draw_index(){ // random number generator;
   uniform_int_distribution<> distribution_j(1, (m_L)); // Choose uniform distr. with range 1,(m_L-1) (
   m_rand_j =  distribution_j(gen_j);
   //cout <<  m_rand;
+  */
 };
 
 void MonteCarlo::draw_acceptance(){
@@ -40,7 +41,6 @@ void MonteCarlo::draw_acceptance(){
 void MonteCarlo::metropolis(double w){
 // sampling rule for montecarlo method. Choose if suggested flip should be accepted
 m_cont = false;
-draw_acceptance();
 if (m_check <= w){
   m_cont = true;
   }

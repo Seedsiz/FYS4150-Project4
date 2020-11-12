@@ -2,8 +2,10 @@
 #include "catch.hpp"
 #include "montecarlo.hpp"
 #include <iostream>
+#include <armadillo>
 
 using namespace std;
+using namespace arma;
 
 
 void menu();
@@ -14,16 +16,22 @@ int main(int argc, char const *argv[]){
 }
 
 void menu(){
-  int L;
-  int MC;
-  double T;
+  int L; int MC;
+  double T_start, T_end;
+  int n;
+
   cout << "Enter integer number of spin particles for each axis:" << " ";
   cin >> L;
-  cout << "Enter number of MC cycles:"  << " ";
+  cout << "Enter integer number of MC cycles:"  << " ";
   cin >> MC;
-  cout << "Choose a temperature T:"  << " ";
-  cin >> T;
+  cout << "Enter start point temperature:"  << " ";
+  cin >> T_start;
+  cout << "Enter an endpoint temperature:"  << " ";
+  cin >> T_end;
+  cout << "Enter integer number of temperature points to be evaluated:"  << " ";
+  cin >> n;
 
+  /*
   //Tryout random generator
   //MonteCarlo mysolver;
   //mysolver.initialize(L,T);
@@ -34,4 +42,5 @@ void menu(){
   model.solve();
 
   //Catch::Session().run();
+  */
 }
