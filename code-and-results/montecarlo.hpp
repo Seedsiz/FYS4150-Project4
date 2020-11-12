@@ -10,15 +10,16 @@ using namespace std;
 class MonteCarlo{
 
 protected:
+  int m_nT; // number of temperatures to loop over
   int m_L; // number of grid points (spin particles) // move these two maybe
   vec m_accepted; // cumulative number of accepted spins
-  double m_T; //temperature
+  vec m_T; // vector with temperatures to loop over
   int m_MC; //number of monte carlo cycles
   int m_rand_i; // the random index to draw
   int m_rand_j; // the random index to draw
   double m_check; // the random r in [0,1] acceptance criteria
   vec m_map; // a mapping instead of ghost cells
-  vec getBoltzmann; // A vector containing boltzmann (deltaEs)
+  mat getBoltzmann; // A vector containing boltzmann (deltaEs)
   double m_deltaE; // actual change in energy, store as int?
   double m_w; // The boltzmann ratio gotten from getBoltzmann
   double m_beta; // m_beta = 1/m_T
@@ -47,7 +48,7 @@ protected:
   vec S; // A vector containing all spins; must be initalized in a random state
 
 public:
-  void init(int L, double T, int MC);
+  void init(int L, double T_start, double T_end, int n_T, int MC);
   int magnetic_moment();
   void expectation_values();
   void energy();

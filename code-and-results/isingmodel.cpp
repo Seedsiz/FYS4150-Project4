@@ -8,12 +8,12 @@ using namespace arma;
 using namespace std;
 
 
-void IsingModel2D::init(int L, double T, int MC){
+void IsingModel2D::init(int L, double T_start, double T_end, int n_T, int MC){
   // Create mapping vector so that physical mesh points are
   // connected to ghost cells (check that these are int!!!)
   //initialize(L,temp);
-  m_T = T; // temperature
-  m_beta = 1/m_T;
+  m_nT = n_T; // number of temperatures to loop over
+  m_T = linspace<vec>(T_start, T_end, n_T);  // temperature vec to loop over
   m_L = L; // number of spins along a given axis (square 2D system)
   m_MC = MC; // number of Monte carlo cycles
   m_map = vec(m_L+2);
@@ -26,17 +26,20 @@ void IsingModel2D::init(int L, double T, int MC){
   }
 
   // Setting up boltzmann ratio
-  m_beta = 1/m_T;
-  getBoltzmann = vec(17); // 5 different energy states: Scale J to 1;
-  getBoltzmann(0) = exp(m_beta*8.0); // boltzmann for deltaE = -8
-  getBoltzmann(4) = exp(m_beta*4.0); // boltzmann for deltaE = -4
-  getBoltzmann(8) = 1.0; //deltaE = 0 exp^0 = 1 // boltzmann for deltaE = 0
-  getBoltzmann(12) = exp(-m_beta*4.0); // boltzmann for deltaE = 4
-  getBoltzmann(16) = exp(-m_beta*8.0); // boltzmann for deltaE = 8
+  getBoltzmann = zeros<mat>(m_nT,17); // set
+  // 5 different energy states: Scale J to 1;
+  for (int i = 0; i < m_nT; i++){
+    m_beta = 1/((double) m_T(i));
+    getBoltzmann(i,0) = exp(m_beta*8.0); // boltzmann for deltaE = -8
+    getBoltzmann(i,4) = exp(m_beta*4.0); // boltzmann for deltaE = -4
+    getBoltzmann(i,8) = 1.0; //deltaE = 0 exp^0 = 1 // boltzmann for deltaE = 0
+    getBoltzmann(i,12) = exp(-m_beta*4.0); // boltzmann for deltaE = 4
+    getBoltzmann(i,16) = exp(-m_beta*8.0); // boltzmann for deltaE = 8
+  }
 
   S = vec(L*L);   //Setting up lattice of L*L elements
   draw_acceptance();    //Getting random number
-  if(m_T >= 1) {        //Temperature check
+  if(m_T(0) >= 1) {        //Temperature check
     for(int i = 0; i < L*L; i++) {    //If the temperature is greater than 1,
       if(m_check < 0.5) {             //the lattice is filled with random spins.
         S(i) = -1;
@@ -60,7 +63,7 @@ void IsingModel2D::init(int L, double T, int MC){
 
 int IsingModel2D::magnetic_moment(){
   /* Code for magnetization for one specific
-  state with periodic boundary conditions (2D
+  state with periodic boundary conditions (2D)
 
   Calculating total magnetization, by summing over all spins
   for one specific state */
@@ -131,84 +134,89 @@ vec IsingModel2D::solve(){
   exp_val_Mabs = 0;
   int cumulative_accept = 0;
 
-    /* Mersenne twister random generator suggest
-      flipping of spin with random index. PS: indices are thereafter mapped;
-      */ // seed once in the beginning
-    int rd = chrono::high_resolution_clock::now().time_since_epoch().count(); //+ rank <--  for parallellization;
-    mt19937_64 gen_i(rd);      // seeded with rd
-    uniform_int_distribution<> distribution_i(1, (m_L)); // Choose uniform distr. with range 1,(m_L) (unsigned integer)
+  /* Mersenne twister random generator suggest
+  flipping of spin with random index. PS: indices are thereafter mapped;
+  */ // seed once in the beginning
+  int rd = chrono::high_resolution_clock::now().time_since_epoch().count(); //+ rank <--  for parallellization;
+  mt19937_64 gen_i(rd);      // seeded with rd
+  uniform_int_distribution<> distribution_i(1, (m_L)); // Choose uniform distr. with range 1,(m_L) (unsigned integer)
 
-    int sd = chrono::high_resolution_clock::now().time_since_epoch().count(); //+ rank <--  for parallellization;
-    mt19937_64 gen_j(sd);     // seeded with sd
-    uniform_int_distribution<> distribution_j(1, (m_L)); // Choose uniform distr. with range 1,(m_L)
+  int sd = chrono::high_resolution_clock::now().time_since_epoch().count(); //+ rank <--  for parallellization;
+  mt19937_64 gen_j(sd);     // seeded with sd
+  uniform_int_distribution<> distribution_j(1, (m_L)); // Choose uniform distr. with range 1,(m_L)
 
-    /*random number between [0,1); seed once */
-    int td = chrono::high_resolution_clock::now().time_since_epoch().count(); // Used to obtain seed
-    mt19937_64 gen(td);                                                       // seeded with sd
-    uniform_real_distribution<double> distribution(0.0,1.0);                  // creates [0,1)
+  /*random number between [0,1); seed once */
+  int td = chrono::high_resolution_clock::now().time_since_epoch().count(); // Used to obtain seed
+  mt19937_64 gen(td);                                                       // seeded with sd
+  uniform_real_distribution<double> distribution(0.0,1.0);                  // creates [0,1)
 
   energy(); // calculate initial energy
   //cout << "Estart:"<< m_Energy << "\n";
   magnetic_moment(); // calculate initial magnetic moment
-  for (int c = 0; c < m_MC; c++){
-    for (int i = 0; i < m_L*m_L; i++){
-      m_rand_i =  distribution_i(gen_i); // Draw index i on physical mesh, suggest flip
-      m_rand_j =  distribution_j(gen_j); // Draw index j on physical mesh, suggest flip
-      find_deltaE(m_rand_i, m_rand_j);  //calculating deltaE and m_w for flip of the random indices
+  for (int temp = 0; temp < m_nT; temp++){
+    for (int c = 0; c < m_MC; c++){
+      for (int i = 0; i < m_L*m_L; i++){
+        m_rand_i =  distribution_i(gen_i); // Draw index i on physical mesh, suggest flip
+        m_rand_j =  distribution_j(gen_j); // Draw index j on physical mesh, suggest flip
+        find_deltaE(m_rand_i, m_rand_j);  //calculating deltaE and m_w for flip of the random indices
 
-      m_check =  distribution(gen);    // draw acceptance criteria
-      metropolis(m_w);                 //returns true or false, given deltaE
+        m_check =  distribution(gen);    // draw acceptance criteria
+        metropolis(m_w);                 //returns true or false, given deltaE
 
-      if (m_cont == true){  // !!! Uncertain if this if statement needs to be here (could have only one)
-    	  m_Energy += m_deltaE; // Calculating value of cycle
-        S(m_map(m_rand_i)*m_L + m_map(m_rand_j)) *= -1.0;    // if true, flip one spin and accept new spin config
-    	  m_MagneticMoment += 2*S(m_map(m_rand_i)*m_L + m_map(m_rand_j)); // check why this is like this
-        cumulative_accept += 1;
-        //cout << "dE" << m_deltaE << "\n";
+        if (m_cont == true){  // !!! Uncertain if this if statement needs to be here (could have only one)
+    	     m_Energy += m_deltaE; // Calculating value of cycle
+           S(m_map(m_rand_i)*m_L + m_map(m_rand_j)) *= -1.0;    // if true, flip one spin and accept new spin config
+    	      m_MagneticMoment += 2*S(m_map(m_rand_i)*m_L + m_map(m_rand_j)); // check why this is like this
+            cumulative_accept += 1;
+            //cout << "dE" << m_deltaE << "\n";
+          }
         }
+        // first store endpoint energy value for this cycle
+        E_cycles(c) = m_Energy;
+        M_cycles(c) = m_MagneticMoment;
+
+        //adding expectation values from each cycle
+        exp_val_E += m_Energy;
+        exp_val_E2 += m_Energy*m_Energy;
+        exp_val_M += m_MagneticMoment;
+        exp_val_M2 += m_MagneticMoment*m_MagneticMoment;
+        exp_val_Mabs += fabs(m_MagneticMoment);
+
+        // store accepted flips:
+        m_accepted(c) = cumulative_accept;
       }
-    // first store endpoint energy value for this cycle
-    E_cycles(c) = m_Energy;
-    M_cycles(c) = m_MagneticMoment;
+      //Get final expectation value over all cycles for this temperature: Dividing the sum with number
+      //of MC cycles m_MC to get expectation values.
+      exp_values(0) = exp_val_E/((double) m_MC);
+      exp_values(1) = exp_val_M/((double) m_MC);
+      exp_values(2) = exp_val_Mabs/((double) m_MC);
 
-    //adding expectation values from each cycle
-    exp_val_E += m_Energy;
-    exp_val_E2 += m_Energy*m_Energy;
-    exp_val_M += m_MagneticMoment;
-    exp_val_M2 += m_MagneticMoment*m_MagneticMoment;
-    exp_val_Mabs += fabs(m_MagneticMoment);
+      exp_val_E2 = exp_val_E2/((double) m_MC);
+      exp_val_M2 = exp_val_M2/((double) m_MC);
 
-    // store accepted flips:
-    m_accepted(c) = cumulative_accept;
+      //Calculating variance for energy and magnetization
+      //Finding specific heat m_Cv and suceptibility m_xi
+      double varianceE = exp_val_E2 - exp_values(0)*exp_values(0);
+      double varianceM = exp_val_M2 - exp_values(1)*exp_values(1);
+      m_Cv = varianceE/(m_T(temp)*m_T(temp));
+      m_xi = varianceM/m_T(temp);
+      exp_values(3) = m_Cv;
+      exp_values(4) = m_xi;
+
+      //cout << setprecision(15) << ((double) 1/m_L2)*exp_values << "\n";
+      //cout << m_accepted;
+      //cout << E_cycles; //
+      //cout << M_cycles;
+
+      // Scaling by L^2 spins because m_L is an intrinsic parameter
+      E_cycles = ((double) 1/m_L2)*E_cycles;
+      M_cycles = ((double) 1/m_L2)*M_cycles;
   }
-  //Get final expectation value over all cycles: Dividing the sum with number
-  //of MC cycles m_MC to get expectation values.
-  exp_values(0) = exp_val_E/((double) m_MC);
-  exp_values(1) = exp_val_M/((double) m_MC);
-  exp_values(2) = exp_val_Mabs/((double) m_MC);
-
-  exp_val_E2 = exp_val_E2/((double) m_MC);
-  exp_val_M2 = exp_val_M2/((double) m_MC);
-
-  //Calculating variance for energy and magnetization
-  //Finding specific heat m_Cv and suceptibility m_xi
-  double varianceE = exp_val_E2 - exp_values(0)*exp_values(0);
-  double varianceM = exp_val_M2 - exp_values(1)*exp_values(1);
-  m_Cv = varianceE/(m_T*m_T);
-  m_xi = varianceM/m_T;
-  exp_values(3) = m_Cv;
-  exp_values(4) = m_xi;
-
-  //cout << setprecision(15) << ((double) 1/m_L2)*exp_values << "\n";
-  //cout << m_accepted;
-  //cout << E_cycles; //
-  //cout << M_cycles;
-
-  // Scaling by L^2 spins because m_L is an intrinsic parameter
-  E_cycles = ((double) 1/m_L2)*E_cycles;
-  M_cycles = ((double) 1/m_L2)*M_cycles;
-  return ((double) 1/m_L2)*exp_values;
+  return ((double) 1/m_L2)*exp_values; // return something
 }
+
+
+
 
 void IsingModel2D::write_exp_vals_to_file(){
 

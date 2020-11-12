@@ -18,7 +18,7 @@ int main(int argc, char const *argv[]){
 void menu(){
   int L; int MC;
   double T_start, T_end;
-  int n;
+  int n_T;
 
   cout << "Enter integer number of spin particles for each axis:" << " ";
   cin >> L;
@@ -29,7 +29,7 @@ void menu(){
   cout << "Enter an endpoint temperature:"  << " ";
   cin >> T_end;
   cout << "Enter integer number of temperature points to be evaluated:"  << " ";
-  cin >> n;
+  cin >> n_T;
 
   /*
   //Tryout random generator
@@ -38,7 +38,7 @@ void menu(){
   //mysolver.draw_index();
   //mysolver.draw_acceptance();
   IsingModel2D model;
-  model.init(L, T, MC);
+  model.init(L, T_start,T_end, n_T, MC);
   model.solve();
 
   //Catch::Session().run();

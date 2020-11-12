@@ -6,8 +6,10 @@ TEST_CASE("Testing expectation values") {
   IsingModel2D mysolver;
   int L = 2;
   int MC = 100;
-  double T = 1.0;
-  mysolver.init(L, T, MC);
+  double T1 = 1.0;
+  double T2 = 1.0;
+  int n = 1;
+  mysolver.init(L, T1, T2, n, MC);
   vec exp_val;
   exp_val = mysolver.solve();
 
@@ -23,11 +25,11 @@ TEST_CASE("Testing expectation values") {
   num_val(2) = Cv_num;
   num_val(3) = xi_num;
 
-  double z = 12 + 4*cosh((double) (8/T));
-  double exp_E = -((double) (32/z))*sinh((double) 8/T);
+  double z = 12 + 4*cosh((double) (8/T1));
+  double exp_E = -((double) (32/z))*sinh((double) 8/T1);
   double mean_abs_M = (double) (3/2);
-  double Cv = ((double) 256/(T*T*z))*(cosh((double) 8/T) - (4/z)*sinh((double) 8/T)*sinh((double) 8/T));
-  double xi = ((double) 32/(T*z))*(exp((double) 8/T) + 1);
+  double Cv = ((double) 256/(T1*T1*z))*(cosh((double) 8/T1) - (4/z)*sinh((double) 8/T1)*sinh((double) 8/T1));
+  double xi = ((double) 32/(T1*z))*(exp((double) 8/T1) + 1);
 
   vec exact = vec(4);
   exact(0) = exp_E;
