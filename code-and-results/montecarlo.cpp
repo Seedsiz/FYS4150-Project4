@@ -18,7 +18,6 @@ void MonteCarlo::draw_index(){ // random number generator;
   mt19937_64 gen_i(rd);      // seeded with rd
   uniform_int_distribution<> distribution_i(1, (m_L)); // Choose uniform distr. with range 1,(m_L-1) (unsigned integer)
   m_rand_i =  distribution_i(gen_i); // Draw index, flip this  (PS, needs to call for both i and j values)
-
   int sd = chrono::high_resolution_clock::now().time_since_epoch().count(); //+ rank <--  for parallellization;
   mt19937_64 gen_j(sd);     // seeded with sd
   uniform_int_distribution<> distribution_j(1, (m_L)); // Choose uniform distr. with range 1,(m_L-1) (
@@ -38,27 +37,6 @@ void MonteCarlo::draw_acceptance(){
   //cout << m_check << endl;
 };
 
-void MonteCarlo::metropolis(double w, mt19937_64 gen, uniform_real_distribution<double> distribution, vec S){
-// sampling rule for montecarlo method. Choose if suggested flip should be accepted
-  //cout << m_deltaE << "\n";
-
-  /*if (m_deltaE <= 0){
-    m_Energy += m_deltaE; // Calculating value of cycle
-    S(m_map(m_rand_i)*m_L + m_map(m_rand_j)) *= -1.0;    // if true, flip one spin and accept new spin config
-    m_MagneticMoment += 2*S(m_map(m_rand_i)*m_L + m_map(m_rand_j)); // check why this is like this
-    m_cumulative_accept += 1;
-  }*/
-  //cout << m_rand_i << " " << m_rand_j << "\n";
-  //cout << m_map << "\n";
-  draw_acceptance();
-  if(m_check <= w){  // !!! Uncertain if this if statement needs to be here (could have only one)
-   //cout << m_rand_i << " " << m_rand_j << "\n";
-   m_Energy += m_deltaE; // Calculating value of cycle
-   S(m_map(m_rand_i)*m_L + m_map(m_rand_j)) *= -1.0;    // if true, flip one spin and accept new spin config
-   m_MagneticMoment += 2*S(m_map(m_rand_i)*m_L + m_map(m_rand_j)); // check why this is like this
-   m_cumulative_accept += 1;
- }
-}
 
 void MonteCarlo::monte_carlo(vec S){
 

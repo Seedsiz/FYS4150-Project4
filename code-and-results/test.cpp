@@ -5,7 +5,7 @@
 TEST_CASE("Testing expectation values") {
   IsingModel2D mysolver;
   int L = 2;
-  int MC = 1e2;
+  int MC = 1e7;
   double T = 1.0;
   double T2 = 1.0;
   int n = 1;

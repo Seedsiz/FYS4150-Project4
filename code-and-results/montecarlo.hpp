@@ -39,7 +39,7 @@ public:
   void initialize(int L, double T);
   void draw_index(); // random number generator: get flip index
   void draw_acceptance(); // rnd get r [0,1] acceptance criteria
-  void metropolis(double w, mt19937_64 gen, uniform_real_distribution<double> distribution, vec S); // sampling rule;
+  //void metropolis(double w, vec S); // sampling rule;
   void monte_carlo(vec S); // calculates one MC cycle only
   void expectation_values();             // Get expectation_values
 };
@@ -53,10 +53,9 @@ public:
   void init(int L, double T_start, double T_end, int n_T, int MC);
   void setup_boltzmann_ratio(int tempi);
   int magnetic_moment();
-  void expectation_values();
+  void metropolis(double w, mt19937_64 gen, uniform_real_distribution<double> distribution, double m_check);
   void energy();
   void find_deltaE(int tempi, int flip_i, int flip_j);
-  void specHeat();
   vec solve();
   void open_exp_vals_to_file(ofstream&file);
   void write_exp_vals_to_file(vec expval,ofstream &file, int temp);
