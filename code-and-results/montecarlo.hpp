@@ -3,6 +3,8 @@
 
 #include <armadillo>
 #include <iostream>
+#include <chrono>
+#include <random> // To get access to the mersenne twister random generator
 
 using namespace arma;
 using namespace std;
@@ -34,6 +36,9 @@ protected:
   double exp_val_Mabs;   //expectation value for mean absolute value of magnetization
   double m_Cv, m_xi;    //specific heat and susceptibility
   int m_sign; // To get right boltzmann factor and deltaE
+  /*random number between [0,1); seed once */
+  mt19937_64 m_gen;                                                       // seeded with sd
+  uniform_real_distribution<double> m_distribution;                  // creates [0,1)
 
 public:
   void initialize(int L, double T);
@@ -53,7 +58,7 @@ public:
   void init(int L, double T_start, double T_end, int n_T, int MC);
   void setup_boltzmann_ratio(int tempi);
   int magnetic_moment();
-  void metropolis(double w, mt19937_64 gen, uniform_real_distribution<double> distribution, double m_check);
+  void metropolis(double w);
   void energy();
   void find_deltaE(int tempi, int flip_i, int flip_j);
   vec solve();

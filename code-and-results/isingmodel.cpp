@@ -1,8 +1,9 @@
 #include "montecarlo.hpp"
-
+#include <random> // To get access to the mersenne twister random generator
 #include <armadillo>
 #include <iostream>
 #include <iomanip>
+#include <chrono>
 
 using namespace arma;
 using namespace std;
@@ -108,16 +109,16 @@ void IsingModel2D::find_deltaE(int temp_i,int i, int j){
 }
 
 
-void IsingModel2D::metropolis(double w, mt19937_64 gen, uniform_real_distribution<double> distribution, double m_check){
+void IsingModel2D::metropolis(double w){
 // sampling rule for montecarlo method. Choose if suggested flip should be accepted
-  if (m_deltaE <= 0.0){
+  if (m_deltaE < 0.0){
     m_Energy += m_deltaE; // Calculating value of cycle
     S(m_map(m_rand_i)*m_L + m_map(m_rand_j)) *= -1.0;    // if true, flip one spin and accept new spin config
     m_MagneticMoment += 2*S(m_map(m_rand_i)*m_L + m_map(m_rand_j)); // check why this is like this
     m_cumulative_accept += 1;
   }
 
-  else if (m_check <= w){  // !!! Uncertain if this if statement needs to be here (could have only one)
+  else if (m_distribution(m_gen) <= w){  // !!! Uncertain if this if statement needs to be here (could have only one)
     m_Energy += m_deltaE; // Calculating value of cycle
     S(m_map(m_rand_i)*m_L + m_map(m_rand_j)) *= -1.0;    // if true, flip one spin and accept new spin config
     m_MagneticMoment += 2*S(m_map(m_rand_i)*m_L + m_map(m_rand_j)); // check why this is like this
@@ -156,10 +157,9 @@ vec IsingModel2D::solve(){
   mt19937_64 gen_j(sd);     // seeded with sd
   uniform_int_distribution<> distribution_j(1, (m_L)); // Choose uniform distr. with range 1,(m_L)
 
-  /*random number between [0,1); seed once */
-  int td = chrono::high_resolution_clock::now().time_since_epoch().count(); // Used to obtain seed
-  mt19937_64 gen(td);                                                       // seeded with sd
-  uniform_real_distribution<double> distribution(0.0,1.0);                  // creates [0,1)
+  int td = chrono::high_resolution_clock::now().time_since_epoch().count(); //+ rank <--  for parallellization;
+  m_gen.seed(td);
+
 
   energy(); // calculate initial energy
   //cout << "Estart:"<< m_Energy << "\n";
@@ -167,7 +167,6 @@ vec IsingModel2D::solve(){
 
   ofstream myfile; // initiate write to file
   open_exp_vals_to_file(myfile); // opens file to be written
-  m_check =  distribution(gen);    // draw acceptance criteria
 
   for (int temp = 0; temp < m_nT; temp++){
     //cout << temp;
@@ -177,8 +176,8 @@ vec IsingModel2D::solve(){
         m_rand_i =  distribution_i(gen_i); // Draw index i on physical mesh, suggest flip
         m_rand_j =  distribution_j(gen_j); // Draw index j on physical mesh, suggest flip
         find_deltaE(temp, m_rand_i, m_rand_j);  //calculating deltaE and m_w for flip of the random indices
-        m_check =  distribution(gen);
-        metropolis(m_w,gen,distribution,m_check);       // draw acceptance criteria
+        //m_check =  distribution(gen);
+        metropolis(m_w);       // draw acceptance criteria
       }
       // first store endpoint energy value for this cycle
       E_cycles(c) = m_Energy;
