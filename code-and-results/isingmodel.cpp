@@ -157,6 +157,7 @@ vec IsingModel2D::solve(){
   //m_check =  distribution(gen);  // draw acceptance criteria
 
   ofstream myfile; // initiate write to file
+  //hei
   open_exp_vals_to_file(myfile); // opens file to be written
 
   for (int temp = 0; temp < m_nT; temp++){
