@@ -10,9 +10,11 @@ using namespace std;
 class MonteCarlo{
 
 protected:
+  int m_nT; // number of temperatures to loop over
   int m_L; // number of grid points (spin particles) // move these two maybe
+  int m_L2;
   vec m_accepted; // cumulative number of accepted spins
-  double m_T; //temperature
+  vec m_T; // vector with temperatures to loop over
   int m_MC; //number of monte carlo cycles
   int m_rand_i; // the random index to draw
   int m_rand_j; // the random index to draw
@@ -47,13 +49,15 @@ protected:
   vec S; // A vector containing all spins; must be initalized in a random state
 
 public:
-  void init(int L, double T, int MC);
+  void init(int L, double T_start, double T_end, int n_T, int MC);
+  void setup_boltzmann_ratio(int tempi);
   int magnetic_moment();
   void expectation_values();
   void energy();
-  void find_deltaE(int flip_i, int flip_j);
+  void find_deltaE(int tempi, int flip_i, int flip_j);
   void specHeat();
   vec solve();
-  void write_exp_vals_to_file();
+  void open_exp_vals_to_file(ofstream&file);
+  void write_exp_vals_to_file(vec expval,ofstream &file, int temp);
 };
 #endif

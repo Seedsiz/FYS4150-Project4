@@ -7,8 +7,10 @@ TEST_CASE("Testing expectation values") {
   int L = 2;
   int MC = 1e5;
   double T = 1.0;
+  double T2 = 1.0;
+  int n = 1;
   double B = 1./T;
-  mysolver.init(L, T, MC);
+  mysolver.init(L, T,T2, n, MC);
   vec exp_val;
   exp_val = mysolver.solve();
 
@@ -36,9 +38,10 @@ TEST_CASE("Testing expectation values") {
   exact(2) = Cv/(L*L);
   exact(3) = xi/(L*L);
 
+  cout << exact(0) << "\n";
+  cout << num_val(0) << "\n";
 
-  //double tol = 1E-04;
-
+  double tol = 1E-04;
   for(int i = 0; i < 4; i++) {
     cout << num_val[i] << " " << exact[i] << "\n";
     //REQUIRE((num_val[i] - exact[i]) < tol);
