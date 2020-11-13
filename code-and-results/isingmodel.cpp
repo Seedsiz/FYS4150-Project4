@@ -129,8 +129,7 @@ vec IsingModel2D::solve(){
   exp_val_E = 0; exp_val_E2 = 0;
   exp_val_M = 0; exp_val_M2 = 9;
   exp_val_Mabs = 0;
-  int cumulative_accept = 0;
-
+  m_cumulative_accept = 0;
   energy(); // calculate initial energy
   //cout << "Estart:"<< m_Energy << "\n";
   magnetic_moment(); // calculate initial magnetic moment
@@ -148,8 +147,7 @@ vec IsingModel2D::solve(){
     	  m_MagneticMoment += 2*S(m_map(m_rand_i)*m_L + m_map(m_rand_j)); // check why this is like this
         cumulative_accept += 1;
         //cout << "dE" << m_deltaE << "\n";
-        }
-      }
+    }
     // first store endpoint energy value for this cycle
     E_cycles(c) = m_Energy;
     M_cycles(c) = m_MagneticMoment;
@@ -162,7 +160,7 @@ vec IsingModel2D::solve(){
     exp_val_Mabs += fabs(m_MagneticMoment);
 
     // store accepted flips:
-    m_accepted(c) = cumulative_accept;
+    m_accepted(c) = m_cumulative_accept;
   }
   //Get final expectation value over all cycles: Dividing the sum with number
   //of MC cycles m_MC to get expectation values.
@@ -190,6 +188,7 @@ vec IsingModel2D::solve(){
   // Scaling by L^2 spins because m_L is an intrinsic parameter
   E_cycles = ((double) 1/m_L2)*E_cycles;
   M_cycles = ((double) 1/m_L2)*M_cycles;
+  cout << exp_values << "\n";
   return ((double) 1/m_L2)*exp_values;
 }
 

@@ -39,11 +39,22 @@ void MonteCarlo::draw_acceptance(){
 
 void MonteCarlo::metropolis(double w){
 // sampling rule for montecarlo method. Choose if suggested flip should be accepted
-m_cont = false;
-draw_acceptance();
-if (m_check <= w){
-  m_cont = true;
-  }
+//m_cont = false;
+//draw_acceptance();
+if (delta_E <= 0){
+  m_Energy += m_deltaE; // Calculating value of cycle
+  S(m_map(m_rand_i)*m_L + m_map(m_rand_j)) *= -1.0;    // if true, flip one spin and accept new spin config
+  m_MagneticMoment += 2*S(m_map(m_rand_i)*m_L + m_map(m_rand_j)); // check why this is like this
+  cumulative_accept += 1;
+
+}
+else if (m_check <= w){
+  m_Energy += m_deltaE; // Calculating value of cycle
+  S(m_map(m_rand_i)*m_L + m_map(m_rand_j)) *= -1.0;    // if true, flip one spin and accept new spin config
+  m_MagneticMoment += 2*S(m_map(m_rand_i)*m_L + m_map(m_rand_j)); // check why this is like this
+  cumulative_accept += 1;
+  draw_acceptance();
+
 }
 
 void MonteCarlo::monte_carlo(vec S){
