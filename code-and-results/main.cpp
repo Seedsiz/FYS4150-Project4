@@ -21,6 +21,7 @@ void menu(){
   double T_start, T_end;
   int n_T;
   int num_threads;
+  bool save_over_cycles = false;
 
   cout << "Enter integer number of spin particles for each axis:" << " ";
   cin >> L;
@@ -61,7 +62,7 @@ void menu(){
     T_start = T_vec(2*temps_i);
     T_end = T_vec(2*temps_i+1);
     model.init(L, T_start,T_end, n_T, MC);
-    sol = model.solve();
+    sol = model.solve(save_over_cycles);
     cout << sol;
   }
 
