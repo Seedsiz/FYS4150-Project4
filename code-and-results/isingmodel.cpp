@@ -162,7 +162,6 @@ vec IsingModel2D::solve(){
 
 
   energy(); // calculate initial energy
-  //cout << "Estart:"<< m_Energy << "\n";
   magnetic_moment(); // calculate initial magnetic moment
 
   ofstream myfile; // initiate write to file

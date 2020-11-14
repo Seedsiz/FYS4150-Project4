@@ -41,7 +41,7 @@ TEST_CASE("Testing expectation values") {
   double tol = 1E-02;
   for(int i = 0; i < 4; i++) {
     cout << num_val[i] << " " << exact[i] << "\n";
-    //REQUIRE((num_val[i] - exact[i]) < tol);
+    REQUIRE((num_val[i] - exact[i]) < tol);
   }
 
 }
