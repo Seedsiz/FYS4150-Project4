@@ -51,6 +51,9 @@ void menu(){
   T_vec = linspace<vec>(T_start, T_end, num_threads*2);
   IsingModel2D model; // initate class object;
 
+  double start;
+  double end;
+  start = omp_get_wtime();
   omp_set_num_threads(num_threads);
   # pragma omp parallel for default(shared) private (temps_i);
 
@@ -61,6 +64,9 @@ void menu(){
     sol = model.solve();
     cout << sol;
   }
+
+  end = omp_get_wtime();
+  printf("Work took %f seconds\n", end - start);
 
   //IsingModel2D model;
   //model.init(L, T_start,T_end, n_T, MC);
