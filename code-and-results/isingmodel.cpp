@@ -129,7 +129,7 @@ void IsingModel2D::metropolis(double w){
 }
 
 
-vec IsingModel2D::solve(bool save_cycles){
+void IsingModel2D::solve(bool save_cycles){
   // calculates all cycles
   // sends in the indices suggested if metropolis gives true
   // update expectation values and flip
@@ -238,7 +238,7 @@ vec IsingModel2D::solve(bool save_cycles){
   if (save_cycles == true){
     file2 -> close();
   }
-  return exp_values; // return something/or just write to file above?
+  //return exp_values; // return something/or just write to file above?
 }
 
 void IsingModel2D::open_EM_cycles_to_file(ofstream&file){

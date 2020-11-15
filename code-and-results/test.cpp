@@ -1,3 +1,4 @@
+/*
 #include "catch.hpp"
 #include "montecarlo.hpp"
 #include<iostream>
@@ -46,3 +47,4 @@ TEST_CASE("Testing expectation values") {
   }
 
 }
+*/

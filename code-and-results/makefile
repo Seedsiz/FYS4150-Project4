@@ -1,7 +1,7 @@
 all: compile execute
 
 compile:
-	c++ -Wall -o main.out $(wildcard *.cpp) -larmadillo -lomp -std=c++11 -Ofast 
+	Clang++ -Wall -o main.out $(wildcard *.cpp) -larmadillo -lomp -std=c++11 -Ofast
 
 execute:
 	./main.out
