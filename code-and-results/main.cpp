@@ -22,7 +22,7 @@ void menu(){
   double T_start, T_end;
   int n_T;
   int numthreads;
-  bool save_over_cycles = false;
+  bool save_over_cycles = true;
 
   cout << "Enter integer number of spin particles for each axis:" << " ";
   cin >> L;
