@@ -5,3 +5,7 @@ compile:
 
 execute:
 	./main.out
+
+
+plots:
+	python3 makeplots.py
