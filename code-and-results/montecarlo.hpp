@@ -39,6 +39,7 @@ protected:
   /*random number between [0,1); seed once */
   mt19937_64 m_gen;                                                       // seeded with sd
   uniform_real_distribution<double> m_distribution;                  // creates [0,1)
+  ofstream m_file_emcyc; // to get access inside main
 
 public:
   void initialize(int L, double T);
