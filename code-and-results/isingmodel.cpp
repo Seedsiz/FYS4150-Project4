@@ -139,13 +139,6 @@ vec IsingModel2D::solve(bool save_cycles){
   vec exp_values = vec(5); // The final expectation values
   m_accepted = vec(m_MC);
 
-  // Initialize to zero
-  m_accepted.fill(0.0);
-  exp_val_E = 0.0; exp_val_E2 = 0.0;
-  exp_val_M = 0.0; exp_val_M2 = 0.0;
-  exp_val_Mabs = 0.0;
-  m_cumulative_accept = 0.0;
-
   /* Mersenne twister random generator suggest
   flipping of spin with random index. PS: indices are thereafter mapped;
   */ // seed once in the beginning
@@ -160,10 +153,6 @@ vec IsingModel2D::solve(bool save_cycles){
   int td = chrono::high_resolution_clock::now().time_since_epoch().count(); //+ rank <--  for parallellization;
   m_gen.seed(td);
 
-
-  energy(); // calculate initial energy
-  magnetic_moment(); // calculate initial magnetic moment
-
   ofstream file_expv; // initiate write to file
   open_exp_vals_to_file(file_expv); // opens file to be written
 
@@ -172,7 +161,17 @@ vec IsingModel2D::solve(bool save_cycles){
   }
 
   for (int temp = 0; temp < m_nT; temp++){
-    //cout << temp;
+    // Initialize to zero for each temperature
+    // state of S at in last MC cycle for previous temp
+    m_accepted.fill(0.0);
+    exp_val_E = 0.0; exp_val_E2 = 0.0;
+    exp_val_M = 0.0; exp_val_M2 = 0.0;
+    exp_val_Mabs = 0.0;
+    m_cumulative_accept = 0.0;
+
+    energy(); // calculate initial energy
+    magnetic_moment(); // calculate initial magnetic moment
+
     setup_boltzmann_ratio(temp); // get right beta = 1/T
     for (int c = 0; c < m_MC; c++){
       for (int i = 0; i < m_L*m_L; i++){

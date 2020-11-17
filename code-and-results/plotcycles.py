@@ -1,6 +1,8 @@
-# Programme to read off txt files and plot E,M and accepted flips as
-# functions of Monte Carlo cycles
-# PS: Make sure you ran Monte Carlo with the temperature(s) you want
+"""
+Programme to read off txt files and plot E,M and accepted flips as
+functions of Monte Carlo cycles
+PS: Make sure you ran Monte Carlo with the temperature(s) you want
+"""
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -80,6 +82,8 @@ def get_ana(T,ncycles):
 
 L = int(np.sqrt(Lspins))
 
+choice = 0 # set as default
+
 if do == 1:
     print("Press 1 to make plot for 2x2")
     print("Press 2 to make for other spin system")
@@ -145,7 +149,7 @@ elif do == 2:
 
 #print out which cycle which cycle that gets close to convergence
 if choice == 1:# for 2 by 2  for ts (first temperature = 1 if otherwise stated)
-    tol = 1e-3
+    tol = 1e-3 # PS: if set to low, an error message will occur
     epsE = expE_cycles1 - ana_E1
     Eindex = np.where(np.abs(epsE) < tol)[0][0] # get first elem
     epsM = expM_cycles1 - ana_M1;
@@ -167,3 +171,5 @@ if choice == 2:
     Mindex = np.where(np.abs(epsM) < tol)[0][0]
 
     print("MC convergence index - Eindex: {:d}. Mindex: {:d}".format(Eindex+1,Mindex+1))
+else:
+    0
