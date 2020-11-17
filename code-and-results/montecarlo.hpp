@@ -39,6 +39,7 @@ protected:
   /*random number between [0,1); seed once */
   mt19937_64 m_gen;                                                       // seeded with sd
   uniform_real_distribution<double> m_distribution;                  // creates [0,1)
+  ofstream m_file_emcyc; // to get access inside main
 
 public:
   void initialize(int L, double T);
@@ -61,8 +62,10 @@ public:
   void metropolis(double w);
   void energy();
   void find_deltaE(int tempi, int flip_i, int flip_j);
-  vec solve();
+  vec solve(bool save_cycles);
   void open_exp_vals_to_file(ofstream&file);
   void write_exp_vals_to_file(vec expval,ofstream &file, int temp);
+  void open_EM_cycles_to_file(ofstream&file);
+  void write_EM_cycles_to_file(ofstream&file, vec E, vec M, int temp);
 };
 #endif

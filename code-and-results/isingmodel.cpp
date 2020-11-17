@@ -129,7 +129,7 @@ void IsingModel2D::metropolis(double w){
 }
 
 
-vec IsingModel2D::solve(){
+vec IsingModel2D::solve(bool save_cycles){
   // calculates all cycles
   // sends in the indices suggested if metropolis gives true
   // update expectation values and flip
@@ -138,13 +138,6 @@ vec IsingModel2D::solve(){
   vec M_cycles = vec(m_MC); // Store last magnetic moment each cycle
   vec exp_values = vec(5); // The final expectation values
   m_accepted = vec(m_MC);
-
-  // Initialize to zero
-  m_accepted.fill(0);
-  exp_val_E = 0; exp_val_E2 = 0;
-  exp_val_M = 0; exp_val_M2 = 0;
-  exp_val_Mabs = 0;
-  m_cumulative_accept = 0;
 
   /* Mersenne twister random generator suggest
   flipping of spin with random index. PS: indices are thereafter mapped;
@@ -160,15 +153,25 @@ vec IsingModel2D::solve(){
   int td = chrono::high_resolution_clock::now().time_since_epoch().count(); //+ rank <--  for parallellization;
   m_gen.seed(td);
 
+  ofstream file_expv; // initiate write to file
+  open_exp_vals_to_file(file_expv); // opens file to be written
 
-  energy(); // calculate initial energy
-  magnetic_moment(); // calculate initial magnetic moment
-
-  ofstream myfile; // initiate write to file
-  open_exp_vals_to_file(myfile); // opens file to be written
+  if (save_cycles == true){
+    open_EM_cycles_to_file(m_file_emcyc);
+  }
 
   for (int temp = 0; temp < m_nT; temp++){
-    //cout << temp;
+    // Initialize to zero for each temperature
+    // state of S at in last MC cycle for previous temp
+    m_accepted.fill(0.0);
+    exp_val_E = 0.0; exp_val_E2 = 0.0;
+    exp_val_M = 0.0; exp_val_M2 = 0.0;
+    exp_val_Mabs = 0.0;
+    m_cumulative_accept = 0.0;
+
+    energy(); // calculate initial energy
+    magnetic_moment(); // calculate initial magnetic moment
+
     setup_boltzmann_ratio(temp); // get right beta = 1/T
     for (int c = 0; c < m_MC; c++){
       for (int i = 0; i < m_L*m_L; i++){
@@ -178,9 +181,6 @@ vec IsingModel2D::solve(){
         //m_check =  distribution(gen);
         metropolis(m_w);       // draw acceptance criteria
       }
-      // first store endpoint energy value for this cycle
-      E_cycles(c) = m_Energy;
-      M_cycles(c) = m_MagneticMoment;
 
       //adding expectation values from each cycle
       exp_val_E += m_Energy;
@@ -190,6 +190,9 @@ vec IsingModel2D::solve(){
       exp_val_Mabs += fabs(m_MagneticMoment);
       // store accepted flips:
       m_accepted(c) = m_cumulative_accept;
+      // first store endpoint energy value for this cycle
+      E_cycles(c) = exp_val_E/((double) c+1);
+      M_cycles(c) = exp_val_Mabs/((double) c+1);
     }
     //Get final expectation value over all cycles for this temperature: Dividing the sum with number
     //of MC cycles m_MC to get expectation values.
@@ -210,7 +213,6 @@ vec IsingModel2D::solve(){
     exp_values(4) = m_xi;
 
     //cout << setprecision(15) << ((double) 1/m_L2)*exp_values << "\n";
-    //cout << m_accepted;
     //cout << E_cycles; //
     //cout << M_cycles;
 
@@ -218,17 +220,40 @@ vec IsingModel2D::solve(){
     E_cycles = ((double) 1/m_L2)*E_cycles;
     M_cycles = ((double) 1/m_L2)*M_cycles;
     exp_values = ((double) 1/m_L2)*exp_values;
+    write_exp_vals_to_file(exp_values,file_expv,temp);
+    if (save_cycles == true){
+      write_EM_cycles_to_file(m_file_emcyc, E_cycles, M_cycles, temp);
+    }
 
-    write_exp_vals_to_file(exp_values,myfile,temp);
   }
-  myfile.close();
+  file_expv.close();
+  if (save_cycles == true){
+    m_file_emcyc.close();
+  }
   return exp_values; // return something/or just write to file above?
 }
 
-void IsingModel2D::open_exp_vals_to_file(ofstream&file){
-  string filename("./Results/exp_values/expvalues.txt");
+void IsingModel2D::open_EM_cycles_to_file(ofstream&file){
+  string filename("./Results/exp_values/EMcycles" + to_string(m_MC) +".txt");
   file.open(filename);
-  file    << setprecision(8) << "Temp" << setw(20) << "MC_cycles" << setw(20) << "N_spins" << setw(20)\
+  file  << "T" << setw(20) << "MC_cycles" \
+        << setw(20) << "N_spins" << setw(20) << "accepted flips" << setw(20) \
+        << "<E>/N" << setw(20) << "<|M|>/N";
+  file << "\n";
+}
+
+void IsingModel2D::write_EM_cycles_to_file(ofstream&file, vec E, vec M, int temp){ // write E,M for each cycle
+  for (int cycle = 0; cycle < m_MC; cycle++){
+      file    << setprecision(15) <<  m_T(temp) << setw(20) << m_MC << setw(20) \
+              << m_L2 << setw(20) << m_accepted(cycle) << setw(20) << E(cycle) \
+              << setw(20) << M(cycle) <<"\n";
+      }
+}
+
+void IsingModel2D::open_exp_vals_to_file(ofstream&file){ // write expectation values after all cycles
+  string filename("./Results/exp_values/expvaluescycles" + to_string(m_MC) + ".txt");
+  file.open(filename);
+  file    << "Temp" << setw(20) << "MC_cycles" << setw(20) << "N_spins" << setw(20)\
           << "<E>/N" << setw(20) << "<M>/N" << setw(20) <<  "<|M|>/N" << setw(20) \
           << "Cv" << setw(20) << "Xi";
   file << "\n";
@@ -238,9 +263,8 @@ void IsingModel2D::write_exp_vals_to_file(vec expval,ofstream&file, int temp){
   // write energies, magnetization, number of MC cycles,  to file
   // write in the end expectation values to file
   // post-process these in python.
-  file    << setprecision(8) << m_T(temp) << setw(20) << m_MC << setw(20) << m_L2 << setw(20)\
+  file    << setprecision(15) << m_T(temp) << setw(20) << m_MC << setw(20) << m_L2 << setw(20)\
           << expval(0) << setw(20) << expval(1) << setw(20) <<  expval(2) << setw(20) \
           << expval(3) << setw(20) << expval(4);
   file << "\n";
-
 }

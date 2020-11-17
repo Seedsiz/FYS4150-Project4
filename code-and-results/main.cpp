@@ -3,6 +3,8 @@
 #include "montecarlo.hpp"
 #include <iostream>
 #include <armadillo>
+#include <omp.h>
+#include <stdio.h>
 
 using namespace std;
 using namespace arma;
@@ -16,9 +18,11 @@ int main(int argc, char const *argv[]){
 }
 
 void menu(){
-  /*int L; int MC;
+  int L; int MC;
   double T_start, T_end;
   int n_T;
+  int numthreads;
+  bool save_over_cycles = true;
 
   cout << "Enter integer number of spin particles for each axis:" << " ";
   cin >> L;
@@ -30,17 +34,46 @@ void menu(){
   cin >> n_T;
   cout << "Enter integer number of MC cycles:"  << " ";
   cin >> MC;
+  cout << "Enter integer number of threads:"  << " ";
+  cin >> numthreads;
 
   //Tryout random generator
   //MonteCarlo mysolver;
   //mysolver.initialize(L,T);
   //mysolver.draw_index();
   //mysolver.draw_acceptance();
-  IsingModel2D model;
-  model.init(L, T_start,T_end, n_T, MC);
-  model.solve();*/
 
+  // Start parallelization
+  int temps_i;
+  vec T_vec;
+  vec sol;
 
-  Catch::Session().run();
+  // set up T_vec for start and end for each node
+  // temperature vector with T_start, T_end for nodes
+  T_vec = linspace<vec>(T_start, T_end, numthreads+1);
+  IsingModel2D model; // initate class object;
+
+  double start;
+  double end;
+  start = omp_get_wtime();
+  omp_set_num_threads(numthreads);
+  #pragma omp parallel;
+  #pragma omp parallel for schedule(static) nowait num_threads(numthreads) private(temps_i)
+  for (temps_i = 0; temps_i < numthreads; temps_i++){
+    T_start = T_vec(temps_i);
+    T_end = T_vec(temps_i+1);
+    model.init(L, T_start,T_end, n_T, MC);
+    model.solve(save_over_cycles);
+    printf("Thread rank: %d\n", omp_get_thread_num());
+  }
+
+  end = omp_get_wtime();
+  printf("Work took %f seconds\n", end - start);
+
+  //IsingModel2D model;
+  //model.init(L, T_start,T_end, n_T, MC);
+  //model.solve();
+
+  //Catch::Session().run();
 
 }
