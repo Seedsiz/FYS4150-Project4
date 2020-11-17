@@ -27,7 +27,7 @@ TEST_CASE("Testing expectation values") {
   num_val(2) = Cv_num;
   num_val(3) = xi_num;
 
-  double z = 12. + 4*cosh(8*T);
+  double z = 12. + 4*cosh(8*B);
   double exp_E = -(32./z)*sinh(8*B);
   double mean_abs_M = (8./z)*(exp(8*B) + 2);
   double Cv = ((double) 256/(T*T*z))*(cosh(8*B) - (4/z)*sinh(8*B)*sinh(8*B));
