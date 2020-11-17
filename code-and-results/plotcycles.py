@@ -166,4 +166,4 @@ if choice == 2:
     Eindex = np.where(np.abs(epsE) < tol)[0][0]
     Mindex = np.where(np.abs(epsM) < tol)[0][0]
 
-    print("MC cycle close to analytical - Eindex: {:d}. Mindex: {:d}".format(Eindex+1,Mindex+1))
+    print("MC convergence index - Eindex: {:d}. Mindex: {:d}".format(Eindex+1,Mindex+1))
