@@ -31,7 +31,7 @@ void IsingModel2D::init(int L, double T_start, double T_end, int n_T, int MC){
 
   S = vec(L*L);   //Setting up lattice of L*L elements
   draw_acceptance();    //Getting random number
-  if(m_T(0) >= 1) {        //Temperature check
+  if(m_T(0) >= 3) {        //Temperature check
     for(int i = 0; i < L*L; i++) {    //If the temperature is greater than 1,
       if(m_check < 0.5) {             //the lattice is filled with random spins.
         S(i) = -1;
