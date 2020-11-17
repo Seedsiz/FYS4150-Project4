@@ -7,5 +7,5 @@ execute:
 	./main.out
 
 
-plots:
-	python3 makeplots.py
+plotmc:
+	python3 plotcycles.py
