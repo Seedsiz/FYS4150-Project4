@@ -206,9 +206,15 @@ vec IsingModel2D::solve(bool save_cycles, int calibration){ // calibration: numb
       exp_val_Mabs += fabs(m_MagneticMoment);
       // store accepted flips:
       m_accepted(c) = m_cumulative_accept;
+
       // first store endpoint energy value for this cycle
-      E_cycles(c) = exp_val_E/((double) c - m_calibration+1);
-      M_cycles(c) = exp_val_Mabs/((double) c - m_calibration+1);
+      // to get histograms (could also do this for plotcycles)
+      E_cycles(c) = m_Energy;
+      M_cycles(c) = m_MagneticMoment;
+
+      // or one could store expectation values (for plotcycles)
+      //E_cycles(c) = exp_val_E/((double) c - m_calibration+1);
+      //M_cycles(c) = exp_val_Mabs/((double) c - m_calibration+1);
     }
     //Get final expectation value over all cycles for this temperature: Dividing the sum with number
     //of MC cycles m_MC to get expectation values.
@@ -255,7 +261,7 @@ vec IsingModel2D::solve(bool save_cycles, int calibration){ // calibration: numb
 }
 
 void IsingModel2D::open_EM_cycles_to_file(ofstream&file){
-  string filename("./Results/exp_values/EMcycles" + to_string(m_MC) + \
+  string filename("./Results/cycles/EMcycles" + to_string(m_MC) + \
                 "-" + to_string(m_L) + "by" + to_string(m_L) + ".txt");
   file.open(filename);
   file  << "T" << setw(20) << "MC_cycles-ac" \
@@ -277,9 +283,9 @@ void IsingModel2D::open_exp_vals_to_file(ofstream&file){ // write expectation va
   string filename("./Results/exp_values/expvaluescycles" + to_string(m_MC) + \
                   "-" + to_string(m_L) + "by" + to_string(m_L) + ".txt");
   file.open(filename);
-  file    << "T" << setw(20) << "MC_cycles-ac" << setw(20) << "N_spins" << setw(20)\
-          << "<E>/N" << setw(20) << "<M>/N" << setw(20) <<  "<|M|>/N" << setw(20) \
-          << "Cv" << setw(20) << "Xi" << setw(20) << "varE" << setw(20) << "varM";
+  file    << "T" << setw(25) << "MC_cycles-ac" << setw(25) << "N_spins" << setw(25)\
+          << "<E>/N" << setw(25) << "<M>/N" << setw(25) <<  "<|M|>/N" << setw(25) \
+          << "Cv" << setw(25) << "Xi" << setw(25) << "varE" << setw(25) << "varM";
   file << "\n";
 }
 
@@ -287,8 +293,8 @@ void IsingModel2D::write_exp_vals_to_file(vec expval,ofstream&file, int temp, do
   // write energies, magnetization, number of MC cycles,  to file
   // write in the end expectation values to file
   // post-process these in python.
-  file    << setprecision(15) << m_T(temp) << setw(20) << m_MC-m_calibration << setw(20) << m_L2 << setw(20)\
-          << expval(0) << setw(20) << expval(1) << setw(20) <<  expval(2) << setw(20) \
-          << expval(3) << setw(20) << expval(4) << setw(20) << varE << setw(20) << varM;
+  file    << setprecision(15) << m_T(temp) << setw(25) << m_MC-m_calibration << setw(25) << m_L2 << setw(25)\
+          << expval(0) << setw(25) << expval(1) << setw(25) <<  expval(2) << setw(25) \
+          << expval(3) << setw(25) << expval(4) << setw(25) << varE << setw(25) << varM;
   file << "\n";
 }

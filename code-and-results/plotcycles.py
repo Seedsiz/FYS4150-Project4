@@ -2,6 +2,7 @@
 Programme to read off txt files and plot E,M and accepted flips as
 functions of Monte Carlo cycles
 PS: Make sure you ran Monte Carlo with the temperature(s) you want
+set calibration cycles to 0
 """
 import numpy as np
 import matplotlib.pyplot as plt
@@ -16,7 +17,7 @@ print("Press 1 to plot E and M over cycles")
 print("Press 2 to plot number of accepted flips over cycles")
 do = int(input("Enter number:"))
 
-infile = open("./Results/exp_values/EMcycles" + str(Ncycles) + \
+infile = open("./Results/cycles/EMcycles" + str(Ncycles) + \
                 "-" + str(L) + "by" + str(L) + ".txt", 'r')
 infile.readline()
 
@@ -32,6 +33,8 @@ for line in infile:
     accepted.append(float(numbers[3]))
     expE_cycles.append(float(numbers[4]))
     expM_cycles.append(float(numbers[5]))
+
+infile.close()
 
 expE_cycles = np.array(expE_cycles)
 expM_cycles = np.array(expM_cycles)
@@ -108,7 +111,7 @@ if do == 1:
     plt.xticks(fontsize=14)
     plt.yticks(fontsize=14)
     plt.tight_layout()
-    plt.savefig("./Results/Figures/Ecycles-{:d}by{:d}spinsystem-{:d}temps-T1-{:f}.png".format(L,L,n_temps,Ts))
+    plt.savefig("./Results/Figures/Calibration-Plots/Ecycles-{:d}by{:d}spinsystem-{:d}temps-T1-{:f}.png".format(L,L,n_temps,Ts))
     plt.show()
 
     ### plot absolute magnetic moment expectation ###
@@ -129,7 +132,7 @@ if do == 1:
     plt.xticks(fontsize=14)
     plt.yticks(fontsize=14)
     plt.tight_layout()
-    plt.savefig("./Results/Figures/Mcycles-{:d}by{:d}spinsystem-{:d}temps-T1-{:f}.png".format(L,L,n_temps,Ts))
+    plt.savefig("./Results/Figures/Calibration-Plots/Mcycles-{:d}by{:d}spinsystem-{:d}temps-T1-{:f}.png".format(L,L,n_temps,Ts))
     plt.show()
 
 elif do == 2:
@@ -145,7 +148,7 @@ elif do == 2:
     plt.yticks(fontsize=14)
     plt.legend(loc = "best",fontsize = 14)
     plt.tight_layout()
-    plt.savefig("./Results/Figures/accepted_draws-{:d}by{:d}spinsystem-{:d}temps-T1-{:f}.png".format(L,L,n_temps,Ts))
+    plt.savefig("./Results/Figures/Calibration-Plots/accepted_draws-{:d}by{:d}spinsystem-{:d}temps-T1-{:f}.png".format(L,L,n_temps,Ts))
     plt.show()
 
 #print out which cycle which cycle that gets close to convergence

@@ -9,3 +9,6 @@ execute:
 
 plotmc:
 	python3 plotcycles.py
+
+plothist:
+	python3 plothist.py
