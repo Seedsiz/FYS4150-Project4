@@ -129,10 +129,11 @@ void IsingModel2D::metropolis(double w){
 }
 
 
-vec IsingModel2D::solve(bool save_cycles){
+vec IsingModel2D::solve(bool save_cycles, int calibration){ // calibration: number of calibration cycles
   // calculates all cycles
   // sends in the indices suggested if metropolis gives true
   // update expectation values and flip
+  m_calibration = calibration;
   m_L2 = m_L*m_L;
   vec E_cycles = vec(m_MC); //Store last energy for each cycle
   vec M_cycles = vec(m_MC); // Store last magnetic moment each cycle
@@ -173,15 +174,30 @@ vec IsingModel2D::solve(bool save_cycles){
     magnetic_moment(); // calculate initial magnetic moment
 
     setup_boltzmann_ratio(temp); // get right beta = 1/T
-    for (int c = 0; c < m_MC; c++){
+
+    // Calibration cycles: run through some percentage of samples before
+    // adding energies and magnetic moment to expectation values and variances
+    for (int c = 0; c < m_calibration; c++){
       for (int i = 0; i < m_L*m_L; i++){
         m_rand_i =  distribution_i(gen_i); // Draw index i on physical mesh, suggest flip
         m_rand_j =  distribution_j(gen_j); // Draw index j on physical mesh, suggest flip
         find_deltaE(temp, m_rand_i, m_rand_j);  //calculating deltaE and m_w for flip of the random indices
         //m_check =  distribution(gen);
-        metropolis(m_w);       // draw acceptance criteria
+        metropolis(m_w);       // draw acceptance criteria, flip or not
       }
+      // store accepted flips:
+      m_accepted(c) = m_cumulative_accept;
+    }
 
+    // cycles contributing to mean and variance
+    for (int c = m_calibration; c < m_MC; c++){
+      for (int i = 0; i < m_L*m_L; i++){
+        m_rand_i =  distribution_i(gen_i); // Draw index i on physical mesh, suggest flip
+        m_rand_j =  distribution_j(gen_j); // Draw index j on physical mesh, suggest flip
+        find_deltaE(temp, m_rand_i, m_rand_j);  //calculating deltaE and m_w for flip of the random indices
+        //m_check =  distribution(gen);
+        metropolis(m_w);       // draw acceptance criteria, flip or not
+      }
       //adding expectation values from each cycle
       exp_val_E += m_Energy;
       exp_val_E2 += m_Energy*m_Energy;
@@ -191,17 +207,20 @@ vec IsingModel2D::solve(bool save_cycles){
       // store accepted flips:
       m_accepted(c) = m_cumulative_accept;
       // first store endpoint energy value for this cycle
-      E_cycles(c) = exp_val_E/((double) c+1);
-      M_cycles(c) = exp_val_Mabs/((double) c+1);
+      E_cycles(c) = exp_val_E/((double) c - m_calibration+1);
+      M_cycles(c) = exp_val_Mabs/((double) c - m_calibration+1);
     }
     //Get final expectation value over all cycles for this temperature: Dividing the sum with number
     //of MC cycles m_MC to get expectation values.
-    exp_values(0) = exp_val_E/((double) m_MC);
-    exp_values(1) = exp_val_M/((double) m_MC);
-    exp_values(2) = exp_val_Mabs/((double) m_MC);
 
-    exp_val_E2 = exp_val_E2/((double) m_MC);
-    exp_val_M2 = exp_val_M2/((double) m_MC);
+    int c_contrib = m_MC - m_calibration; // cycles contributing to expectation values
+
+    exp_values(0) = exp_val_E/((double) c_contrib);
+    exp_values(1) = exp_val_M/((double) c_contrib);
+    exp_values(2) = exp_val_Mabs/((double) c_contrib);
+
+    exp_val_E2 = exp_val_E2/((double) c_contrib);
+    exp_val_M2 = exp_val_M2/((double) c_contrib);
 
     //Calculating variance for energy and magnetization
     //Finding specific heat m_Cv and suceptibility m_xi
@@ -220,11 +239,13 @@ vec IsingModel2D::solve(bool save_cycles){
     E_cycles = ((double) 1/m_L2)*E_cycles;
     M_cycles = ((double) 1/m_L2)*M_cycles;
     exp_values = ((double) 1/m_L2)*exp_values;
+    varianceE = ((double) 1/m_L2)*varianceE;
+    varianceM = ((double) 1/m_L2)*varianceM;
+
     write_exp_vals_to_file(exp_values,file_expv,temp, varianceE,varianceM);
     if (save_cycles == true){
-      write_EM_cycles_to_file(m_file_emcyc, E_cycles, M_cycles, temp,varianceE,varianceM);
+      write_EM_cycles_to_file(m_file_emcyc, E_cycles, M_cycles, temp);
     }
-
   }
   file_expv.close();
   if (save_cycles == true){
@@ -237,17 +258,17 @@ void IsingModel2D::open_EM_cycles_to_file(ofstream&file){
   string filename("./Results/exp_values/EMcycles" + to_string(m_MC) + \
                 "-" + to_string(m_L) + "by" + to_string(m_L) + ".txt");
   file.open(filename);
-  file  << "T" << setw(20) << "MC_cycles" \
+  file  << "T" << setw(20) << "MC_cycles-ac" \
         << setw(20) << "N_spins" << setw(20) << "accepted flips" << setw(20) \
-        << "<E>/N" << setw(20) << "<|M|>/N" << setw(20) << "varE" << setw(20) << "varM";
+        << "<E>/N" << setw(20) << "<|M|>/N";
   file << "\n";
 }
 
-void IsingModel2D::write_EM_cycles_to_file(ofstream&file, vec E, vec M, int temp, double varE, double varM){ // write E,M for each cycle
+void IsingModel2D::write_EM_cycles_to_file(ofstream&file, vec E, vec M, int temp){ // write E,M for each cycle
   for (int cycle = 0; cycle < m_MC; cycle++){
-      file    << setprecision(15) <<  m_T(temp) << setw(20) << m_MC << setw(20) \
+      file    << setprecision(15) <<  m_T(temp) << setw(20) << m_MC-m_calibration << setw(20) \
               << m_L2 << setw(20) << m_accepted(cycle) << setw(20) << E(cycle) \
-              << setw(20) << M(cycle) << setw(20) << varE << setw(20) << varM;
+              << setw(20) << M(cycle);
       file << "\n";
       }
 }
@@ -256,7 +277,7 @@ void IsingModel2D::open_exp_vals_to_file(ofstream&file){ // write expectation va
   string filename("./Results/exp_values/expvaluescycles" + to_string(m_MC) + \
                   "-" + to_string(m_L) + "by" + to_string(m_L) + ".txt");
   file.open(filename);
-  file    << "T" << setw(20) << "MC_cycles" << setw(20) << "N_spins" << setw(20)\
+  file    << "T" << setw(20) << "MC_cycles-ac" << setw(20) << "N_spins" << setw(20)\
           << "<E>/N" << setw(20) << "<M>/N" << setw(20) <<  "<|M|>/N" << setw(20) \
           << "Cv" << setw(20) << "Xi" << setw(20) << "varE" << setw(20) << "varM";
   file << "\n";
@@ -266,7 +287,7 @@ void IsingModel2D::write_exp_vals_to_file(vec expval,ofstream&file, int temp, do
   // write energies, magnetization, number of MC cycles,  to file
   // write in the end expectation values to file
   // post-process these in python.
-  file    << setprecision(15) << m_T(temp) << setw(20) << m_MC << setw(20) << m_L2 << setw(20)\
+  file    << setprecision(15) << m_T(temp) << setw(20) << m_MC-m_calibration << setw(20) << m_L2 << setw(20)\
           << expval(0) << setw(20) << expval(1) << setw(20) <<  expval(2) << setw(20) \
           << expval(3) << setw(20) << expval(4) << setw(20) << varE << setw(20) << varM;
   file << "\n";

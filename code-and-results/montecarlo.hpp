@@ -12,6 +12,7 @@ using namespace std;
 class MonteCarlo{
 
 protected:
+  int m_calibration; // number of calibration cycles
   int m_nT; // number of temperatures to loop over
   int m_L; // number of grid points (spin particles) // move these two maybe
   int m_L2;
@@ -62,10 +63,10 @@ public:
   void metropolis(double w);
   void energy();
   void find_deltaE(int tempi, int flip_i, int flip_j);
-  vec solve(bool save_cycles);
+  vec solve(bool save_cycles, int calibration);
   void open_exp_vals_to_file(ofstream&file);
   void write_exp_vals_to_file(vec expval,ofstream &file, int temp, double varE, double varM);
   void open_EM_cycles_to_file(ofstream&file);
-  void write_EM_cycles_to_file(ofstream&file, vec E, vec M, int temp, double varE, double varM);
+  void write_EM_cycles_to_file(ofstream&file, vec E, vec M, int temp);
 };
 #endif
