@@ -7,6 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 Ncycles = int(input("Input number of Monte Carlo cycles:"))
+L = int(input("Input number of spins for a given axis:"))
 n_temps = int(input("1 or 2 temperatures to be evaluated?"))
 if n_temps == 1:
     TT = float(input("Set temperature:"))
@@ -15,7 +16,8 @@ print("Press 1 to plot E and M over cycles")
 print("Press 2 to plot number of accepted flips over cycles")
 do = int(input("Enter number:"))
 
-infile = open("./Results/exp_values/EMcycles" + str(Ncycles) + ".txt", 'r')
+infile = open("./Results/exp_values/EMcycles" + str(Ncycles) + \
+                "-" + str(L) + "by" + str(L) + ".txt", 'r')
 infile.readline()
 
 expE_cycles = []   # energies
@@ -27,7 +29,6 @@ temperatures = []
 for line in infile:
     numbers = line.split()
     temperatures.append(float(numbers[0]))
-    Lspins = int(numbers[2])
     accepted.append(float(numbers[3]))
     expE_cycles.append(float(numbers[4]))
     expM_cycles.append(float(numbers[5]))
@@ -80,7 +81,7 @@ def get_ana(T,ncycles):
     ana_M = np.zeros(ncycles) + mean_abs_M
     return ana_E, ana_M
 
-L = int(np.sqrt(Lspins))
+#L = int(np.sqrt(Lspins))
 
 choice = 0 # set as default
 

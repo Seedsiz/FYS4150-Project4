@@ -1,0 +1,2 @@
+T           MC_cycles             N_spins               <E>/N               <M>/N             <|M|>/N                  Cv                  Xi                varE                varM
+1                 100                   4                  -2                   1                   1                   0                   0                   0                   0
