@@ -55,12 +55,8 @@ stdE = np.array(stdE_scalar)
 expE_cycles = expE_cycles[Ncycles-cycles:Ncycles] # take out the expectation values that are not included (0 since not filled in)
 
 if do == 1:
-    width_interval = 2  # if just energies saved (not expecation values) // comment out
-    range_ =  np.max(expE_cycles) - np.min(expE_cycles) # range of lowest energies and min energies
-    N_bins = int(range_/width_interval) + 1 # get number of bins
-
     sns.set_style('darkgrid')
-    sns.displot(expE_cycles, bins = N_bins, discrete=True, height=3, aspect=1) #kde = True)
+    sns.displot(expE_cycles, height=3, aspect=1)
 
 if do == 2:
     # decide upon number of bins
@@ -69,8 +65,8 @@ if do == 2:
     N_bins = int(range_/width_interval) + 1 # get number of bins
 
     sns.set_style('darkgrid')
-    sns.displot(expE_cycles, bins = N_bins, height=3, aspect=1) # look into this one: A lot easier to use and super nice
-    #kde = True
+    sns.displot(expE_cycles,bins = N_bins, height=3, aspect=1) # look into this one: A lot easier to use and super nice
+
 
 plt.title("{:d}x{:d}, MC cycles:{:.1e}, Calibration Cycles: {:.1e}".format(L,L,Ncycles,Ncycles-cycles))
 labels, counts = np.unique(expE_cycles, return_counts=True)
@@ -79,7 +75,8 @@ if do == 1:
     plt.xlabel('$Energy/L^{2}$')
 elif do == 2:
     plt.xlabel('$\mathbb{E}[E]/L^{2}$')
-plt.ylabel('Frequency (log$_{10}$)')
+
+plt.ylabel('Frequency')
 plt.yscale('log')
 plt.legend(["$\mu=%.3e, \sigma=%.1e$"%(expE, stdE)])
 plt.savefig("./Results/Figures/Histograms/hist-{:d}by{:d}spinsystem-T-{:f}-option-{:d}.png".format(L,L,T,do))
