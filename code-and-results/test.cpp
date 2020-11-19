@@ -11,7 +11,8 @@ TEST_CASE("Testing expectation values") {
   double T2 = 1.0;
   int n = 1;
   double B = 1./T;
-  mysolver.init(L, T,T2, n, MC);
+  int rank = 0;
+  mysolver.init(L, T,T2, n, MC, rank);
   bool save_over_cycles = false;
   vec exp_val;
   exp_val = mysolver.solve(save_over_cycles, calibration);

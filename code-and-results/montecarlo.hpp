@@ -42,6 +42,7 @@ protected:
   uniform_real_distribution<double> m_distribution;                  // creates [0,1)
   ofstream m_file_emcyc; // cycles to file,  to get access
   ofstream m_file_expv; // expectation values file, to close
+  int m_rank;
 
 public:
   void initialize(int L, double T);
@@ -58,7 +59,7 @@ protected:
   vec S; // A vector containing all spins; must be initalized in a random state
 
 public:
-  void init(int L, double T_start, double T_end, int n_T, int MC);
+  void init(int L, double T_start, double T_end, int n_T, int MC, int rank);
   void setup_boltzmann_ratio(int tempi);
   int magnetic_moment();
   void metropolis(double w);
@@ -69,6 +70,5 @@ public:
   void write_exp_vals_to_file(vec expval,ofstream &file, int temp, double varE, double varM);
   void open_EM_cycles_to_file(ofstream&file);
   void write_EM_cycles_to_file(ofstream&file, vec E, vec M, int temp);
-  void close_exp_vals_to_file(); // close this write to file in main
 };
 #endif

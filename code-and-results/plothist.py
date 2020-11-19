@@ -13,6 +13,7 @@ import seaborn as sns
 
 Ncycles = int(input("Enter number of Monte Carlo cycles:"))
 L = int(input("Enter number of spins for a given axis:"))
+rank = int(input("Enter rank number (assumes only one rank used (1-4)):"))
 print("Press 1 to plot energy histogram")
 print("Press 2 to plot energy expectation value histogram")
 do = int(input("Enter number:"))
@@ -34,7 +35,7 @@ expE_cycles = np.array(expE_cycles)
 
 # read off the expectation value and variance
 infile = open("./Results/exp_values/expvaluescycles" + str(Ncycles) + \
-              "-" + str(L) + "by" + str(L) + ".txt");
+              "-" + str(L) + "by" + str(L) +  "rank" + rank + ".txt");
 infile.readline()
 
 expE = [] # expecation values for different temperatures
