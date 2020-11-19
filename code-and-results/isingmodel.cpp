@@ -118,7 +118,7 @@ void IsingModel2D::metropolis(double w){
     m_cumulative_accept += 1;
   }
 
-  else if (m_distribution(m_gen) <= w){  // !!! Uncertain if this if statement needs to be here (could have only one)
+  else if (m_distribution(m_gen) <= w){
     m_Energy += m_deltaE; // Calculating value of cycle
     S(m_map(m_rand_i)*m_L + m_map(m_rand_j)) *= -1.0;    // if true, flip one spin and accept new spin config
     m_MagneticMoment += 2*S(m_map(m_rand_i)*m_L + m_map(m_rand_j)); // check why this is like this
@@ -199,6 +199,7 @@ vec IsingModel2D::solve(bool save_cycles){
     exp_values(0) = exp_val_E/((double) m_MC);
     exp_values(1) = exp_val_M/((double) m_MC);
     exp_values(2) = exp_val_Mabs/((double) m_MC);
+
 
     exp_val_E2 = exp_val_E2/((double) m_MC);
     exp_val_M2 = exp_val_M2/((double) m_MC);

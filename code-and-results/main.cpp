@@ -18,7 +18,7 @@ int main(int argc, char const *argv[]){
 }
 
 void menu(){
-  int L; int MC;
+  /*int L; int MC;
   double T_start, T_end;
   int n_T;
   int numthreads;
@@ -57,7 +57,6 @@ void menu(){
   double end;
   start = omp_get_wtime();
   omp_set_num_threads(numthreads);
-  #pragma omp parallel;
   #pragma omp parallel for schedule(static) nowait num_threads(numthreads) private(temps_i)
   for (temps_i = 0; temps_i < numthreads; temps_i++){
     T_start = T_vec(temps_i);
@@ -74,6 +73,6 @@ void menu(){
   //model.init(L, T_start,T_end, n_T, MC);
   //model.solve();
 
-  //Catch::Session().run();
+  Catch::Session().run();
 
 }
