@@ -4,7 +4,6 @@
 #include <iostream>
 #include <armadillo>
 #include <omp.h>
-#include <stdio.h>
 
 using namespace std;
 using namespace arma;
@@ -56,16 +55,14 @@ void menu(){
   double end;
   start = omp_get_wtime();
   omp_set_num_threads(numthreads);
-  #pragma omp parallel for default(none) num_threads(numthreads) private(temps_i)
-  for (temps_i = 0; temps_i < numthreads; temps_i++){
-    T_start = T_vec(2*temps_i);
-    T_end = T_vec(2*temps_i+1);
-    model.init(L, T_start,T_end, n_T, MC);
-    sol = model.solve();
-    printf("Thread rank: %d\n", omp_get_thread_num());
-
-  }
-
+  #pragma omp parallel for default(shared) num_threads(numthreads) private(temps_i)
+    for (temps_i = 0; temps_i < numthreads; temps_i++){
+      T_start = T_vec(2*temps_i);
+      T_end = T_vec(2*temps_i+1);
+      model.init(L, T_start,T_end, n_T, MC);
+      sol = model.solve();
+      printf("Thread rank: %d\n", omp_get_thread_num());
+    }
   end = omp_get_wtime();
   printf("Work took %f seconds\n", end - start);
 
