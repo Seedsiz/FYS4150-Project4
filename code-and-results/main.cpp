@@ -22,7 +22,6 @@ void menu(){
   double T_start, T_end;
   int n_T;
   int numthreads;
-  bool save_over_cycles = true;
 
   cout << "Enter integer number of spin particles for each axis:" << " ";
   cin >> L;
@@ -50,22 +49,21 @@ void menu(){
 
   // set up T_vec for start and end for each node
   // temperature vector with T_start, T_end for nodes
-  T_vec = linspace<vec>(T_start, T_end, numthreads+1);
+  T_vec = linspace<vec>(T_start, T_end, numthreads*2);
   IsingModel2D model; // initate class object;
 
   double start;
   double end;
   start = omp_get_wtime();
   omp_set_num_threads(numthreads);
-  #pragma omp parallel for schedule(static) nowait num_threads(numthreads) private(temps_i)
-  for (temps_i = 0; temps_i < numthreads; temps_i++){
-    T_start = T_vec(temps_i);
-    T_end = T_vec(temps_i+1);
-    model.init(L, T_start,T_end, n_T, MC);
-    model.solve(save_over_cycles);
-    printf("Thread rank: %d\n", omp_get_thread_num());
-  }
-
+  #pragma omp parallel for default(shared) num_threads(numthreads) private(temps_i)
+    for (temps_i = 0; temps_i < numthreads; temps_i++){
+      T_start = T_vec(2*temps_i);
+      T_end = T_vec(2*temps_i+1);
+      model.init(L, T_start,T_end, n_T, MC);
+      sol = model.solve();
+      printf("Thread rank: %d\n", omp_get_thread_num());
+    }
   end = omp_get_wtime();
   printf("Work took %f seconds\n", end - start);
 
