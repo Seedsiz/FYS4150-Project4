@@ -186,7 +186,7 @@ vec IsingModel2D::solve(bool save_cycles, int calibration){ // calibration: numb
         metropolis(m_w);       // draw acceptance criteria, flip or not
       }
       // store accepted flips:
-      m_accepted(c) = m_cumulative_accept;
+      //m_accepted(c) = m_cumulative_accept;
     }
 
     // cycles contributing to mean and variance
@@ -205,7 +205,7 @@ vec IsingModel2D::solve(bool save_cycles, int calibration){ // calibration: numb
       exp_val_M2 += m_MagneticMoment*m_MagneticMoment;
       exp_val_Mabs += fabs(m_MagneticMoment);
       // store accepted flips:
-      m_accepted(c) = m_cumulative_accept;
+      //m_accepted(c) = m_cumulative_accept;
 
       // first store endpoint energy value for this cycle
       // to get histograms (could also do this for plotcycles)
@@ -213,8 +213,8 @@ vec IsingModel2D::solve(bool save_cycles, int calibration){ // calibration: numb
       //M_cycles(c) = m_MagneticMoment;
 
       // or one could store expectation values (for plotcycles)
-      E_cycles(c) = exp_val_E/((double) c - m_calibration+1);
-      M_cycles(c) = exp_val_Mabs/((double) c - m_calibration+1);
+      //E_cycles(c) = exp_val_E/((double) c - m_calibration+1);
+      //M_cycles(c) = exp_val_Mabs/((double) c - m_calibration+1);
     }
     //Get final expectation value over all cycles for this temperature: Dividing the sum with number
     //of MC cycles m_MC to get expectation values.
