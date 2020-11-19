@@ -55,7 +55,7 @@ void menu(){
   // set up T_vec for start and end for each node
   // temperature vector with T_start, T_end for nodes
   T_vec = linspace<vec>(T_start, T_end, numthreads+1);
-  IsingModel2D model; // initate class object;
+
 
   double start;
   double end;
@@ -65,6 +65,7 @@ void menu(){
   for (temps_i = 0; temps_i < numthreads; temps_i++){
     T_start = T_vec(temps_i);
     T_end = T_vec(temps_i+1);
+    IsingModel2D model; // initate class object;
     model.init(L, T_start,T_end, n_T, MC);
     model.solve(save_over_cycles,calib);
     printf("Thread rank: %d\n", omp_get_thread_num());
