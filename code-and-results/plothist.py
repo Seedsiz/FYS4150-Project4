@@ -13,13 +13,14 @@ import seaborn as sns
 
 Ncycles = int(input("Enter number of Monte Carlo cycles:"))
 L = int(input("Enter number of spins for a given axis:"))
+rank = int(input("Enter rank number (assumes only one rank used (1-4)):"))
 print("Press 1 to plot energy histogram")
 print("Press 2 to plot energy expectation value histogram")
 do = int(input("Enter number:"))
 
 # read the energies over cycles (after calibration)
 infile = open("./Results/cycles/EMcycles" + str(Ncycles) + \
-                "-" + str(L) + "by" + str(L) + ".txt", 'r')
+                "-" + str(L) + "by" + str(L) + "rank" + rank + ".txt", 'r')
 infile.readline()
 
 expE_cycles = []   # energies,  could add histogram for M if wanted
