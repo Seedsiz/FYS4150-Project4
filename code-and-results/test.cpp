@@ -4,8 +4,9 @@
 
 TEST_CASE("Testing expectation values") {
   IsingModel2D mysolver;
-  int L = 30;
-  int MC = 1e5;
+  int calibration = 20000;
+  int L = 2;
+  int MC = 1e7;
   double T = 1.0;
   double T2 = 1.0;
   int n = 1;
@@ -13,7 +14,7 @@ TEST_CASE("Testing expectation values") {
   mysolver.init(L, T,T2, n, MC);
   bool save_over_cycles = false;
   vec exp_val;
-  exp_val = mysolver.solve(save_over_cycles);
+  exp_val = mysolver.solve(save_over_cycles, calibration);
 
   double exp_E_num = exp_val(0);
   double exp_M_num = exp_val(1);

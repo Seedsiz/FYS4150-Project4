@@ -22,6 +22,8 @@ void menu(){
   double T_start, T_end;
   int n_T;
   int numthreads;
+  bool save_over_cycles = true;
+  int calib;
 
   cout << "Enter integer number of spin particles for each axis:" << " ";
   cin >> L;
@@ -33,8 +35,11 @@ void menu(){
   cin >> n_T;
   cout << "Enter integer number of MC cycles:"  << " ";
   cin >> MC;
+  cout << "Enter integer number of calibration cycles:"  << " ";
+  cin >> calib; // eg. 20 000
   cout << "Enter integer number of threads:"  << " ";
   cin >> numthreads;
+
 
   //Tryout random generator
   //MonteCarlo mysolver;
@@ -57,13 +62,14 @@ void menu(){
   start = omp_get_wtime();
   omp_set_num_threads(numthreads);
   #pragma omp parallel for default(shared) num_threads(numthreads) private(temps_i)
-    for (temps_i = 0; temps_i < numthreads; temps_i++){
-      T_start = T_vec(2*temps_i);
-      T_end = T_vec(2*temps_i+1);
-      model.init(L, T_start,T_end, n_T, MC);
-      sol = model.solve();
-      printf("Thread rank: %d\n", omp_get_thread_num());
-    }
+  for (temps_i = 0; temps_i < numthreads; temps_i++){
+    T_start = T_vec(temps_i);
+    T_end = T_vec(temps_i+1);
+    model.init(L, T_start,T_end, n_T, MC);
+    model.solve(save_over_cycles,calib);
+    printf("Thread rank: %d\n", omp_get_thread_num());
+  }
+  model.close_exp_vals_to_file();
   end = omp_get_wtime();
   printf("Work took %f seconds\n", end - start);
 
