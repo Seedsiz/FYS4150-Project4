@@ -154,8 +154,7 @@ vec IsingModel2D::solve(bool save_cycles, int calibration){ // calibration: numb
   int td = chrono::high_resolution_clock::now().time_since_epoch().count(); //+ rank <--  for parallellization;
   m_gen.seed(td);
 
-  ofstream file_expv; // initiate write to file
-  open_exp_vals_to_file(file_expv); // opens file to be written
+  open_exp_vals_to_file(m_file_expv); // opens file to be written
 
   if (save_cycles == true){
     open_EM_cycles_to_file(m_file_emcyc);
@@ -248,12 +247,11 @@ vec IsingModel2D::solve(bool save_cycles, int calibration){ // calibration: numb
     varianceE = ((double) 1/m_L2)*varianceE;
     varianceM = ((double) 1/m_L2)*varianceM;
 
-    write_exp_vals_to_file(exp_values,file_expv,temp, varianceE,varianceM);
+    write_exp_vals_to_file(exp_values,m_file_expv,temp, varianceE,varianceM);
     if (save_cycles == true){
       write_EM_cycles_to_file(m_file_emcyc, E_cycles, M_cycles, temp);
     }
   }
-  file_expv.close();
   if (save_cycles == true){
     m_file_emcyc.close();
   }
@@ -279,6 +277,7 @@ void IsingModel2D::write_EM_cycles_to_file(ofstream&file, vec E, vec M, int temp
       }
 }
 
+
 void IsingModel2D::open_exp_vals_to_file(ofstream&file){ // write expectation values after all cycles
   string filename("./Results/exp_values/expvaluescycles" + to_string(m_MC) + \
                   "-" + to_string(m_L) + "by" + to_string(m_L) + ".txt");
@@ -297,4 +296,8 @@ void IsingModel2D::write_exp_vals_to_file(vec expval,ofstream&file, int temp, do
           << expval(0) << setw(25) << expval(1) << setw(25) <<  expval(2) << setw(25) \
           << expval(3) << setw(25) << expval(4) << setw(25) << varE << setw(25) << varM;
   file << "\n";
+}
+
+void IsingModel2D::close_exp_vals_to_file(){ // call in main
+  m_file_expv.close();
 }

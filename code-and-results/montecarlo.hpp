@@ -36,11 +36,12 @@ protected:
   double exp_val_M, exp_val_M2;  //expectation values for magnetization and magnetization squared
   double exp_val_Mabs;   //expectation value for mean absolute value of magnetization
   double m_Cv, m_xi;    //specific heat and susceptibility
-  int m_sign; // To get right boltzmann factor and deltaE
+  //int m_sign; // To get right boltzmann factor and deltaE
   /*random number between [0,1); seed once */
   mt19937_64 m_gen;                                                       // seeded with sd
   uniform_real_distribution<double> m_distribution;                  // creates [0,1)
-  ofstream m_file_emcyc; // to get access inside main
+  ofstream m_file_emcyc; // cycles to file,  to get access
+  ofstream m_file_expv; // expectation values file, to close
 
 public:
   void initialize(int L, double T);
@@ -68,5 +69,6 @@ public:
   void write_exp_vals_to_file(vec expval,ofstream &file, int temp, double varE, double varM);
   void open_EM_cycles_to_file(ofstream&file);
   void write_EM_cycles_to_file(ofstream&file, vec E, vec M, int temp);
+  void close_exp_vals_to_file(); // close this write to file in main
 };
 #endif
