@@ -31,7 +31,7 @@ void IsingModel2D::init(int L, double T_start, double T_end, int n_T, int MC){
 
   S = vec(L*L);   //Setting up lattice of L*L elements
   draw_acceptance();    //Getting random number
-  if(m_T(0) >= 1) {        //Temperature check
+  if(m_T(0) >= 3) {        //Temperature check
     for(int i = 0; i < L*L; i++) {    //If the temperature is greater than 1,
       if(m_check < 0.5) {             //the lattice is filled with random spins.
         S(i) = -1;
@@ -208,12 +208,12 @@ vec IsingModel2D::solve(bool save_cycles, int calibration){ // calibration: numb
 
       // first store endpoint energy value for this cycle
       // to get histograms (could also do this for plotcycles)
-      E_cycles(c) = m_Energy;
-      M_cycles(c) = m_MagneticMoment;
+      //E_cycles(c) = m_Energy;
+      //M_cycles(c) = m_MagneticMoment;
 
       // or one could store expectation values (for plotcycles)
-      //E_cycles(c) = exp_val_E/((double) c - m_calibration+1);
-      //M_cycles(c) = exp_val_Mabs/((double) c - m_calibration+1);
+      E_cycles(c) = exp_val_E/((double) c - m_calibration+1);
+      M_cycles(c) = exp_val_Mabs/((double) c - m_calibration+1);
     }
     //Get final expectation value over all cycles for this temperature: Dividing the sum with number
     //of MC cycles m_MC to get expectation values.

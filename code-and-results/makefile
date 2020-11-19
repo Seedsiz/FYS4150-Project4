@@ -10,5 +10,5 @@ execute:
 plotmc:
 	python3 plotcycles.py
 
-plothist:
+hist:
 	python3 plothist.py
