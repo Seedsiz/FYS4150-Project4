@@ -9,10 +9,11 @@ using namespace arma;
 using namespace std;
 
 
-void IsingModel2D::init(int L, double T_start, double T_end, int n_T, int MC){
+void IsingModel2D::init(int L, double T_start, double T_end, int n_T, int MC, int rank){
   // Create mapping vector so that physical mesh points are
   // connected to ghost cells (check that these are int!!!)
   //initialize(L,temp);
+  m_rank = rank;
   m_nT = n_T; // number of temperatures to loop over
   m_T = linspace<vec>(T_start, T_end, n_T);  // temperature vec to loop over
   m_L = L; // number of spins along a given axis (square 2D system)
@@ -143,15 +144,15 @@ vec IsingModel2D::solve(bool save_cycles, int calibration){ // calibration: numb
   /* Mersenne twister random generator suggest
   flipping of spin with random index. PS: indices are thereafter mapped;
   */ // seed once in the beginning
-  int rd = chrono::high_resolution_clock::now().time_since_epoch().count(); //+ rank <--  for parallellization;
+  int rd = chrono::high_resolution_clock::now().time_since_epoch().count()+ m_rank; // <--  for parallellization;
   mt19937_64 gen_i(rd);      // seeded with rd
   uniform_int_distribution<> distribution_i(1, (m_L)); // Choose uniform distr. with range 1,(m_L) (unsigned integer)
 
-  int sd = chrono::high_resolution_clock::now().time_since_epoch().count(); //+ rank <--  for parallellization;
+  int sd = chrono::high_resolution_clock::now().time_since_epoch().count() + m_rank; //  <--  for parallellization;
   mt19937_64 gen_j(sd);     // seeded with sd
   uniform_int_distribution<> distribution_j(1, (m_L)); // Choose uniform distr. with range 1,(m_L)
 
-  int td = chrono::high_resolution_clock::now().time_since_epoch().count(); //+ rank <--  for parallellization;
+  int td = chrono::high_resolution_clock::now().time_since_epoch().count() + m_rank; //<--  for parallellization;
   m_gen.seed(td);
 
   open_exp_vals_to_file(m_file_expv); // opens file to be written
@@ -252,6 +253,7 @@ vec IsingModel2D::solve(bool save_cycles, int calibration){ // calibration: numb
       write_EM_cycles_to_file(m_file_emcyc, E_cycles, M_cycles, temp);
     }
   }
+  m_file_expv.close();
   if (save_cycles == true){
     m_file_emcyc.close();
   }
@@ -280,7 +282,7 @@ void IsingModel2D::write_EM_cycles_to_file(ofstream&file, vec E, vec M, int temp
 
 void IsingModel2D::open_exp_vals_to_file(ofstream&file){ // write expectation values after all cycles
   string filename("./Results/exp_values/expvaluescycles" + to_string(m_MC) + \
-                  "-" + to_string(m_L) + "by" + to_string(m_L) + ".txt");
+                  "-" + to_string(m_L) + "by" + to_string(m_L) + "rank" + to_string(m_rank) + ".txt");
   file.open(filename);
   file    << "T" << setw(25) << "MC_cycles-ac" << setw(25) << "N_spins" << setw(25)\
           << "<E>/N" << setw(25) << "<M>/N" << setw(25) <<  "<|M|>/N" << setw(25) \
@@ -296,8 +298,4 @@ void IsingModel2D::write_exp_vals_to_file(vec expval,ofstream&file, int temp, do
           << expval(0) << setw(25) << expval(1) << setw(25) <<  expval(2) << setw(25) \
           << expval(3) << setw(25) << expval(4) << setw(25) << varE << setw(25) << varM;
   file << "\n";
-}
-
-void IsingModel2D::close_exp_vals_to_file(){ // call in main
-  m_file_expv.close();
 }
