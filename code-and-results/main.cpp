@@ -54,22 +54,23 @@ void menu(){
 
   // set up T_vec for start and end for each node
   // temperature vector with T_start, T_end for nodes
-  T_vec = linspace<vec>(T_start, T_end, numthreads*2);
-  IsingModel2D model; // initate class object;
+  T_vec = linspace<vec>(T_start, T_end, numthreads+1);
+  //IsingModel2D model; // initate class object;
 
   double start;
   double end;
   start = omp_get_wtime();
-  omp_set_num_threads(numthreads);
+  omp_set_num_threads(4);
   #pragma omp parallel for default(shared) num_threads(numthreads) private(temps_i)
   for (temps_i = 0; temps_i < numthreads; temps_i++){
+    IsingModel2D model;
     T_start = T_vec(temps_i);
     T_end = T_vec(temps_i+1);
     model.init(L, T_start,T_end, n_T, MC);
     model.solve(save_over_cycles,calib);
     printf("Thread rank: %d\n", omp_get_thread_num());
+    model.close_exp_vals_to_file();
   }
-  model.close_exp_vals_to_file();
   end = omp_get_wtime();
   printf("Work took %f seconds\n", end - start);
 

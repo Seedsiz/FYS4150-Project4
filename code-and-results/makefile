@@ -1,7 +1,7 @@
 all: compile execute
 
 compile:
-	clang++ -o main.out $(wildcard *.cpp) -larmadillo -std=c++11 -Ofast -lomp -Xpreprocessor
+	g++ -o main.out $(wildcard *.cpp) -larmadillo -std=c++11 -Ofast -lomp -Xpreprocessor -fopenmp
 
 execute:
 	./main.out
