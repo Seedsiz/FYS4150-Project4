@@ -18,7 +18,7 @@ int main(int argc, char const *argv[]){
 }
 
 void menu(){
-  /*int L; int MC;
+  int L; int MC;
   double T_start, T_end;
   int n_T;
   int numthreads;
@@ -71,6 +71,6 @@ void menu(){
   //model.init(L, T_start,T_end, n_T, MC);
   //model.solve();
 
-  Catch::Session().run();
+  //Catch::Session().run();
 
 }

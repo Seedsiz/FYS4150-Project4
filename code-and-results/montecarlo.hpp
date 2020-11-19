@@ -62,7 +62,7 @@ public:
   void metropolis(double w);
   void energy();
   void find_deltaE(int tempi, int flip_i, int flip_j);
-  vec solve(bool save_cycles);
+  vec solve();
   void open_exp_vals_to_file(ofstream&file);
   void write_exp_vals_to_file(vec expval,ofstream &file, int temp);
   void open_EM_cycles_to_file(ofstream&file);
