@@ -1,0 +1,1 @@
+T        MC_cycles-ac             N_spins      accepted flips               <E>/N             <|M|>/N

@@ -5,3 +5,10 @@ compile:
 
 execute:
 	./main.out
+
+
+plotmc:
+	python3 plotcycles.py
+
+hist:
+	python3 plothist.py

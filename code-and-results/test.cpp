@@ -4,15 +4,18 @@
 
 TEST_CASE("Testing expectation values") {
   IsingModel2D mysolver;
+  int calibration = 20000;
   int L = 2;
   int MC = 1e7;
   double T = 1.0;
   double T2 = 1.0;
   int n = 1;
   double B = 1./T;
-  mysolver.init(L, T,T2, n, MC);
+  int rank = 0;
+  mysolver.init(L, T,T2, n, MC, rank);
+  bool save_over_cycles = false;
   vec exp_val;
-  exp_val = mysolver.solve();
+  exp_val = mysolver.solve(save_over_cycles, calibration);
 
   double exp_E_num = exp_val(0);
   double exp_M_num = exp_val(1);
@@ -26,7 +29,7 @@ TEST_CASE("Testing expectation values") {
   num_val(2) = Cv_num;
   num_val(3) = xi_num;
 
-  double z = 12. + 4*cosh(8*T);
+  double z = 12. + 4*cosh(8*B);
   double exp_E = -(32./z)*sinh(8*B);
   double mean_abs_M = (8./z)*(exp(8*B) + 2);
   double Cv = ((double) 256/(T*T*z))*(cosh(8*B) - (4/z)*sinh(8*B)*sinh(8*B));
