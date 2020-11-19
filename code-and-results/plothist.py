@@ -20,7 +20,7 @@ do = int(input("Enter number:"))
 
 # read the energies over cycles (after calibration)
 infile = open("./Results/cycles/EMcycles" + str(Ncycles) + \
-                "-" + str(L) + "by" + str(L) + "rank" + rank + ".txt", 'r')
+                "-" + str(L) + "by" + str(L) + ".txt", 'r')
 infile.readline()
 
 expE_cycles = []   # energies,  could add histogram for M if wanted
@@ -35,7 +35,7 @@ expE_cycles = np.array(expE_cycles)
 
 # read off the expectation value and variance
 infile = open("./Results/exp_values/expvaluescycles" + str(Ncycles) + \
-              "-" + str(L) + "by" + str(L) + ".txt");
+              "-" + str(L) + "by" + str(L) +  "rank" + rank + ".txt");
 infile.readline()
 
 expE = [] # expecation values for different temperatures
