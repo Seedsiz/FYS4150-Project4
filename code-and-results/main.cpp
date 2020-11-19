@@ -69,8 +69,9 @@ void menu(){
     model.init(L, T_start,T_end, n_T, MC);
     model.solve(save_over_cycles,calib);
     printf("Thread rank: %d\n", omp_get_thread_num());
+    model.close_exp_vals_to_file();
   }
-  model.close_exp_vals_to_file();
+
   end = omp_get_wtime();
   printf("Work took %f seconds\n", end - start);
 
