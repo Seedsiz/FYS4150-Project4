@@ -67,7 +67,6 @@ void menu(){
   double end;
   start = omp_get_wtime();
   omp_set_num_threads(numthreads);
-  IsingModel2D model; // initate class object;
   #pragma omp parallel for default(shared) num_threads(numthreads) private(temps_i)
   for (temps_i = 0; temps_i < numthreads; temps_i++){
     //T_start = T_startvec(temps_i);
