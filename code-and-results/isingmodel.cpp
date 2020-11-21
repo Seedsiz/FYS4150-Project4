@@ -32,7 +32,7 @@ void IsingModel2D::init(int L, double T_start, double T_end, int n_T, int MC, in
 
   S = vec(L*L);   //Setting up lattice of L*L elements
   draw_acceptance();    //Getting random number
-  if(m_T(0) >= 3) {        //Temperature check
+  if(m_T(0) >= 1.1) {        //Temperature check
     for(int i = 0; i < L*L; i++) {    //If the temperature is greater than 1,
       if(m_check < 0.5) {             //the lattice is filled with random spins.
         S(i) = -1;
@@ -257,7 +257,7 @@ vec IsingModel2D::solve(bool save_cycles, int calibration){ // calibration: numb
   if (save_cycles == true){
     m_file_emcyc.close();
   }
-  return exp_values; // return something/or just write to file above?
+  return exp_values; // return something
 }
 
 void IsingModel2D::open_EM_cycles_to_file(ofstream&file){
@@ -298,4 +298,28 @@ void IsingModel2D::write_exp_vals_to_file(vec expval,ofstream&file, int temp, do
           << expval(0) << setw(25) << expval(1) << setw(25) <<  expval(2) << setw(25) \
           << expval(3) << setw(25) << expval(4) << setw(25) << varE << setw(25) << varM;
   file << "\n";
+}
+
+void IsingModel2D::write_spin_to_file(bool check){
+  if (check == true){
+  // open spin to file if true
+  ofstream spinfile;
+  string filename("./Results/spinmatrices/spinmatrix" + to_string(m_MC) + \
+                  "-" + to_string(m_L) + "by" + to_string(m_L) + "rank" + to_string(m_rank) + ".txt");
+  spinfile.open(filename);
+
+  // write spin file
+
+  spinfile << setprecision(4) <<  "T:" << " " << m_T(m_nT-1) << "\n";
+  int i_p, j_p;
+  for (int i = 1; i <= m_L; i++){
+    for (int j = 1; j <= m_L; j++){
+      i_p = m_map(i); j_p = m_map(j); // mapping to physical mesh points
+      spinfile << setprecision(2) <<  S(i_p*m_L + j_p); // get spin matrix
+      spinfile << "\n";
+      }
+    }
+  // close spin file
+  spinfile.close(); //
+  }
 }

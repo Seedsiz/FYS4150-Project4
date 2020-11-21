@@ -23,6 +23,7 @@ void menu(){
   int n_T;
   int numthreads;
   bool save_over_cycles = false;
+  bool save_spin = false;
   int calib;
 
   cout << "Enter integer number of spin particles for each axis:" << " ";
@@ -76,9 +77,11 @@ void menu(){
     model.init(L, T_startvec(temps_i),T_endvec(temps_i), n_T, MC,omp_get_thread_num());
     model.solve(save_over_cycles,calib);
     printf("Thread rank: %d\n", omp_get_thread_num());
+    model.write_spin_to_file(save_spin);
   }
   end = omp_get_wtime();
   printf("Work took %f seconds\n", end - start);
+
   //IsingModel2D model;
   //model.init(L, T_start,T_end, n_T, MC);
   //model.solve();

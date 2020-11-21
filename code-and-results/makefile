@@ -12,3 +12,6 @@ plotmc:
 
 hist:
 	python3 plothist.py
+
+spin:
+	python3 plotspin.py

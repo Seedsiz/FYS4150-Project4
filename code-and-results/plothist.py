@@ -13,7 +13,7 @@ import seaborn as sns
 
 Ncycles = int(input("Enter number of Monte Carlo cycles:"))
 L = int(input("Enter number of spins for a given axis:"))
-rank = int(input("Enter rank number (assumes only one rank used (1-4)):"))
+rank = int(input("Enter rank number (assumes only one rank used (0-3)):"))
 print("Press 1 to plot energy histogram")
 print("Press 2 to plot energy expectation value histogram")
 do = int(input("Enter number:"))
@@ -69,17 +69,17 @@ if do == 2:
     sns.displot(expE_cycles,bins = N_bins, height=3, aspect=1) # look into this one: A lot easier to use and super nice
 
 
-plt.title("{:d}x{:d}, MC cycles:{:.1e}, Calibration Cycles: {:.1e}".format(L,L,Ncycles,Ncycles-cycles))
+plt.title("{:d}x{:d}, MC cycles:{:.1e}, Calibration Cycles: {:.1e}".format(L,L,Ncycles,Ncycles-cycles),fontsize = 14)
 labels, counts = np.unique(expE_cycles, return_counts=True)
 plt.grid(axis='y', alpha=0.75)
 if do == 1:
-    plt.xlabel('$Energy/L^{2}$')
+    plt.xlabel('$Energy/L^{2}$', fontsize = 13)
 elif do == 2:
-    plt.xlabel('$\mathbb{E}[E]/L^{2}$')
+    plt.xlabel('$\mathbb{E}[E]/L^{2}$',fontsize = 13)
 
-plt.ylabel('Frequency')
+plt.ylabel('Frequency',fontsize = 13)
 plt.yscale('log')
-plt.legend(["$\mu=%.3e, \sigma=%.1e$"%(expE, stdE)])
+plt.legend(["$\mu=%.3e, \sigma=%.1e$"%(expE, stdE)],fontsize = 14)
 plt.savefig("./Results/Figures/Histograms/hist-{:d}by{:d}spinsystem-T-{:f}-option-{:d}.png".format(L,L,T,do))
 plt.show()
 

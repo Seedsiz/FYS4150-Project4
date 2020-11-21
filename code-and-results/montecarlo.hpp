@@ -70,5 +70,6 @@ public:
   void write_exp_vals_to_file(vec expval,ofstream &file, int temp, double varE, double varM);
   void open_EM_cycles_to_file(ofstream&file);
   void write_EM_cycles_to_file(ofstream&file, vec E, vec M, int temp);
+  void write_spin_to_file(bool check);
 };
 #endif
