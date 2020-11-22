@@ -10,6 +10,8 @@ Git for Project 4 in Computational Physics (FYS4150).
 
 * Textfiles and figures can be found in the folder Results.
 
+* The calculations are performed with the energy coefficent J, and boltzmann factor, k, set to 1. With this scaling the critical temperature is approximately 2.269 in the termodynamical limit L -> infinity (infinite number of spins in 2D system).
+
 ### Code: Link and description of programmes
 - [main.cpp](https://github.com/Seedsiz/FYS4150-Project4/blob/main/code-and-results/main.cpp) : Runs the other programmes and provide user options through terminal.
 
