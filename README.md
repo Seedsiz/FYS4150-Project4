@@ -50,7 +50,7 @@ How to run the programmes to reproduce the results discussed in the article: The
 After experimentation with the MC cycles, the authors decided to use 20 000 calibration cycles, to get more accurate expectation values for less number of cycles. This ensures also good results for larger spin systems and higher temperatures, which needs more calibration cycles compared to lower temperatures and smaller spin system. If one want to plot more than just expectation values, one must go in the isingmodel.cpp to decomment variables m_accepted, E_cycles and M_cycles. Then you must set the bool objects to true.
 
 ### Links and packages
-- The Mersenne random number generator was used in generating uniform distribution to draw indices and acceptance criteria. Documentation can be found [here.](https://ssd.jpl.nasa.gov/horizons.cgi#top)
+- The Mersenne Twister (pseudo)random number generator was used in generating uniform distribution to draw indices and acceptance criteria. Documentation on the class mt19937_64 can be found [here.](https://www.cplusplus.com/reference/random/mt19937_64/)
 
 - Documentation for Matplotlib from python from [here](https://matplotlib.org/)
 
