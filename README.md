@@ -26,7 +26,7 @@ Git for Project 4 in Computational Physics (FYS4150).
   5. find_deltaE: Find the energy difference between suggested state and present spin configuration. Also gives the boltzmann ratio used in montecarlo sampling.
   6. metropolis: Accepts all flips with dE < 0. For other dE compare boltzmann ratio with random number [0,1). If boltzmann ratio larger, accept.
   7. solve: Gives the energies and magnetic moment, and calculates the expectation values of the 2D Isingmodel for a given number of calibration cycles and Monte Carlo simulations. Writes to file.
-  8. The others methods provided are write to file methods.
+  8. The other methods provided are write to file methods.
 
 - [test.cpp](https://github.com/Seedsiz/FYS4150-Project4/blob/main/code-and-results/test.cpp): Unit tests for a 2 by 2 system with temperature 1. Has headerfile [catch.hpp](https://github.com/Seedsiz/FYS4150-Project4/blob/main/code-and-results/catch.hpp)
 
