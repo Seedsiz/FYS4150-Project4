@@ -1,3 +1,6 @@
+# Programme that make use of the expectation values
+# to plot energy, magnetic moment, heat capacity etc
+# as a function of temperature
 
 import numpy as np
 import matplotlib.pyplot as plt

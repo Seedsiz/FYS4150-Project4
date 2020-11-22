@@ -11,9 +11,9 @@ using namespace std;
 
 void IsingModel2D::init(int L, double T_start, double T_end, int n_T, int MC, int rank){
   // Create mapping vector so that physical mesh points are
-  // connected to ghost cells (check that these are int!!!)
+  // connected to ghost cells
   //initialize(L,temp);
-  m_rank = rank;
+  m_rank = rank; // rank of thread in parallelization
   m_nT = n_T; // number of temperatures to loop over
   m_T = linspace<vec>(T_start, T_end, n_T);  // temperature vec to loop over
   m_L = L; // number of spins along a given axis (square 2D system)
@@ -22,18 +22,19 @@ void IsingModel2D::init(int L, double T_start, double T_end, int n_T, int MC, in
   m_map(0) = m_L-1; // first index in map --> last index in physical mesh
   m_map(m_L+1) = 0; // last index in map --> first index in physical mesh
 
-
+  // setup mapping
   for (int i = 0; i < m_L; i++){
-    m_map(i+1) = i; // mapping is correct
+    m_map(i+1) = i;
   }
 
   // Setting up boltzmann ratio vector
   getBoltzmann = zeros<vec>(17);
 
-  S = vec(L*L);   //Setting up lattice of L*L elements
+  //Setting up lattice of L*L elements
+  S = vec(L*L);
   draw_acceptance();    //Getting random number
   if(m_T(0) >= 1.1) {        //Temperature check
-    for(int i = 0; i < L*L; i++) {    //If the temperature is greater than 1,
+    for(int i = 0; i < L*L; i++) {    //If the temperature is greater than 1.1,
       if(m_check < 0.5) {             //the lattice is filled with random spins.
         S(i) = -1;
       }else {
@@ -42,7 +43,7 @@ void IsingModel2D::init(int L, double T_start, double T_end, int n_T, int MC, in
       draw_acceptance();
     }
   }else {
-    for(int i = 0; i < L*L; i++) {    //If the temperature is smaller than 1,
+    for(int i = 0; i < L*L; i++) {    //If the temperature is smaller than 1.1,
       if(m_check < 0.5) {             //the lattice is filled with either only
         S(i) = -1;                    //positive spins, or only negative.
       }else {
@@ -50,11 +51,11 @@ void IsingModel2D::init(int L, double T_start, double T_end, int n_T, int MC, in
       }
     }
   }
-  //cout << S << "\n";
 }
 
-void IsingModel2D::setup_boltzmann_ratio(int temp_i){ // function to call for each temp
-  // 5 different energy states: Scale J to 1;
+void IsingModel2D::setup_boltzmann_ratio(int temp_i){
+  /* function to call for each temp
+     5 different energy states: Scale J to 1, k to 1; */
     m_beta = 1/((double) m_T(temp_i));
     getBoltzmann(0) = exp(m_beta*8.0); // boltzmann for deltaE = -8
     getBoltzmann(4) = exp(m_beta*4.0); // boltzmann for deltaE = -4
@@ -80,6 +81,7 @@ void IsingModel2D::energy(){
 state with periodic boundary conditions (2D) */
 int i_p; int j_p;
 int i_pp; int j_pp;   //Same as i_p and j_p only i+1 and j+1
+
 // Calculating total energy by multiplying below and to the right
 m_Energy = 0.0;
 for (int i = 1; i <= m_L; i++){
@@ -93,57 +95,64 @@ for (int i = 1; i <= m_L; i++){
 }
 
 void IsingModel2D::find_deltaE(int temp_i,int i, int j){
-  // take in suggested random indices
-  // use the sum of sorrounding spins
+  /* Function which finds change in energy
+  and boltzmann ratio for a suggested flip
+  - takes in suggested random indices */
   int S_candid =  S(m_map(i)*m_L + m_map(j)); // spin suggested flipped
   int S1 =  S(m_map(i-1)*m_L + m_map(j));
   int S2 =  S(m_map(i+1)*m_L + m_map(j));
   int S3 =  S(m_map(i)*m_L + m_map(j-1));
   int S4 =  S(m_map(i)*m_L + m_map(j+1));
+
   m_deltaE = 2*S_candid*(S1 + S2 + S3 + S4);
   int mapping = m_deltaE + 8;
-  m_w = getBoltzmann(mapping); //
-  //cout << "Sc   " << S_candid << "\n";
-  //cout << "sum S  " << (S1 + S2 + S3 + S4) << "\n";
-  //cout << m_deltaE;
-  //cout <<"map:"<< mapping << "\n";
+  m_w = getBoltzmann(mapping);
 }
 
 
 void IsingModel2D::metropolis(double w){
 // sampling rule for montecarlo method. Choose if suggested flip should be accepted
-  if (m_deltaE < 0.0){
+  if (m_deltaE < 0.0){ // if energy change negative, always accept
     m_Energy += m_deltaE; // Calculating value of cycle
     S(m_map(m_rand_i)*m_L + m_map(m_rand_j)) *= -1.0;    // if true, flip one spin and accept new spin config
-    m_MagneticMoment += 2*S(m_map(m_rand_i)*m_L + m_map(m_rand_j)); // check why this is like this
+    m_MagneticMoment += 2*S(m_map(m_rand_i)*m_L + m_map(m_rand_j));
     m_cumulative_accept += 1;
   }
 
-  else if (m_distribution(m_gen) <= w){  // !!! Uncertain if this if statement needs to be here (could have only one)
+  else if (m_distribution(m_gen) <= w){ // if energy change is positive
     m_Energy += m_deltaE; // Calculating value of cycle
     S(m_map(m_rand_i)*m_L + m_map(m_rand_j)) *= -1.0;    // if true, flip one spin and accept new spin config
-    m_MagneticMoment += 2*S(m_map(m_rand_i)*m_L + m_map(m_rand_j)); // check why this is like this
+    m_MagneticMoment += 2*S(m_map(m_rand_i)*m_L + m_map(m_rand_j));
     m_cumulative_accept += 1;
-    //m_check =  distribution(gen);
-    //cout << "dE" << m_deltaE << "\n";
   }
 }
 
 
-vec IsingModel2D::solve(bool save_cycles, int calibration){ // calibration: number of calibration cycles
+vec IsingModel2D::solve(bool save_cycles, int calibration){
+  /*
+  Find the expectation values for a 2D steady state Ising Model
+  for a given number of cycles
+  */
+
+  // calibration: number of calibration cycles
   // calculates all cycles
   // sends in the indices suggested if metropolis gives true
   // update expectation values and flip
+
+  // setting up needed parameters
   m_calibration = calibration;
   m_L2 = m_L*m_L;
   vec E_cycles = vec(m_MC); //Store last energy for each cycle
   vec M_cycles = vec(m_MC); // Store last magnetic moment each cycle
   vec exp_values = vec(5); // The final expectation values
-  m_accepted = vec(m_MC);
+  m_accepted = vec(m_MC); // accumulated number of accepted flips
 
-  /* Mersenne twister random generator suggest
+  /*
+  Mersenne twister random generator suggest
   flipping of spin with random index. PS: indices are thereafter mapped;
-  */ // seed once in the beginning
+  */
+
+  // seed once in the beginning
   int rd = chrono::high_resolution_clock::now().time_since_epoch().count()+ m_rank; // <--  for parallellization;
   mt19937_64 gen_i(rd);      // seeded with rd
   uniform_int_distribution<> distribution_i(1, (m_L)); // Choose uniform distr. with range 1,(m_L) (unsigned integer)
@@ -182,11 +191,13 @@ vec IsingModel2D::solve(bool save_cycles, int calibration){ // calibration: numb
         m_rand_i =  distribution_i(gen_i); // Draw index i on physical mesh, suggest flip
         m_rand_j =  distribution_j(gen_j); // Draw index j on physical mesh, suggest flip
         find_deltaE(temp, m_rand_i, m_rand_j);  //calculating deltaE and m_w for flip of the random indices
-        //m_check =  distribution(gen);
         metropolis(m_w);       // draw acceptance criteria, flip or not
       }
-      // store accepted flips:
-      //m_accepted(c) = m_cumulative_accept;
+      /*
+      Include in code if wanted,
+       //stores accepted flips:
+       m_accepted(c) = m_cumulative_accept;
+      */
     }
 
     // cycles contributing to mean and variance
@@ -195,7 +206,6 @@ vec IsingModel2D::solve(bool save_cycles, int calibration){ // calibration: numb
         m_rand_i =  distribution_i(gen_i); // Draw index i on physical mesh, suggest flip
         m_rand_j =  distribution_j(gen_j); // Draw index j on physical mesh, suggest flip
         find_deltaE(temp, m_rand_i, m_rand_j);  //calculating deltaE and m_w for flip of the random indices
-        //m_check =  distribution(gen);
         metropolis(m_w);       // draw acceptance criteria, flip or not
       }
       //adding expectation values from each cycle
@@ -204,7 +214,10 @@ vec IsingModel2D::solve(bool save_cycles, int calibration){ // calibration: numb
       exp_val_M += m_MagneticMoment;
       exp_val_M2 += m_MagneticMoment*m_MagneticMoment;
       exp_val_Mabs += fabs(m_MagneticMoment);
-      // store accepted flips:
+
+      /*
+      Include in code if wanted, PS: Computationally costly:
+      //store accepted flips:
       //m_accepted(c) = m_cumulative_accept;
 
       // first store endpoint energy value for this cycle
@@ -215,6 +228,7 @@ vec IsingModel2D::solve(bool save_cycles, int calibration){ // calibration: numb
       // or one could store expectation values (for plotcycles)
       //E_cycles(c) = exp_val_E/((double) c - m_calibration+1);
       //M_cycles(c) = exp_val_Mabs/((double) c - m_calibration+1);
+      */
     }
     //Get final expectation value over all cycles for this temperature: Dividing the sum with number
     //of MC cycles m_MC to get expectation values.
@@ -237,10 +251,6 @@ vec IsingModel2D::solve(bool save_cycles, int calibration){ // calibration: numb
     exp_values(3) = m_Cv;
     exp_values(4) = m_xi;
 
-    //cout << setprecision(15) << ((double) 1/m_L2)*exp_values << "\n";
-    //cout << E_cycles; //
-    //cout << M_cycles;
-
     // Scaling by L^2 spins because m_L is an intrinsic parameter
     E_cycles = ((double) 1/m_L2)*E_cycles;
     M_cycles = ((double) 1/m_L2)*M_cycles;
@@ -259,6 +269,10 @@ vec IsingModel2D::solve(bool save_cycles, int calibration){ // calibration: numb
   }
   return exp_values; // return something
 }
+
+/*
+Write to file methods below
+*/
 
 void IsingModel2D::open_EM_cycles_to_file(ofstream&file){
   string filename("./Results/cycles/EMcycles" + to_string(m_MC) + \
@@ -291,9 +305,7 @@ void IsingModel2D::open_exp_vals_to_file(ofstream&file){ // write expectation va
 }
 
 void IsingModel2D::write_exp_vals_to_file(vec expval,ofstream&file, int temp, double varE, double varM){
-  // write energies, magnetization, number of MC cycles,  to file
-  // write in the end expectation values to file
-  // post-process these in python.
+  // write mean energies, magnetization, number of MC cycles,  to file
   file    << setprecision(15) << m_T(temp) << setw(25) << m_MC-m_calibration << setw(25) << m_L2 << setw(25)\
           << expval(0) << setw(25) << expval(1) << setw(25) <<  expval(2) << setw(25) \
           << expval(3) << setw(25) << expval(4) << setw(25) << varE << setw(25) << varM;
@@ -309,7 +321,6 @@ void IsingModel2D::write_spin_to_file(bool check){
   spinfile.open(filename);
 
   // write spin file
-
   spinfile << setprecision(4) <<  "T:" << " " << m_T(m_nT-1) << "\n";
   int i_p, j_p;
   for (int i = 1; i <= m_L; i++){

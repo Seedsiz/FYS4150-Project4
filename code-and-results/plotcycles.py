@@ -1,9 +1,8 @@
-"""
-Programme to read off txt files and plot E,M and accepted flips as
-functions of Monte Carlo cycles
-PS: Make sure you ran Monte Carlo with the temperature(s) you want
-set calibration cycles to 0
-"""
+# Programme to read off txt files and plot E,M and accepted flips as
+# functions of Monte Carlo cycles
+# PS: Make sure you ran Monte Carlo with the temperature(s) you want
+# set calibration cycles to 0
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -26,14 +25,13 @@ expM_cycles= []    # magnetic moment
 accepted = []      # number of accepted flips
 temperatures = []
 
-
+# Read off values from text file
 for line in infile:
     numbers = line.split()
     temperatures.append(float(numbers[0]))
     accepted.append(float(numbers[3]))
     expE_cycles.append(float(numbers[4]))
     expM_cycles.append(float(numbers[5]))
-
 infile.close()
 
 expE_cycles = np.array(expE_cycles)
@@ -83,8 +81,6 @@ def get_ana(T,ncycles):
     ana_E = np.zeros(ncycles) + exp_E
     ana_M = np.zeros(ncycles) + mean_abs_M
     return ana_E, ana_M
-
-#L = int(np.sqrt(Lspins))
 
 choice = 0 # set as default
 
