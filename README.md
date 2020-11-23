@@ -15,7 +15,7 @@ Git for Project 4 in Computational Physics (FYS4150).
 ### Code: Link and description of programmes
 - [main.cpp](https://github.com/Seedsiz/FYS4150-Project4/blob/main/code-and-results/main.cpp) : Runs the other programmes and provide user options through terminal.
 
- - [makefile](https://github.com/lasse-steinnes/FYS4150-Project2/blob/master/code-and-results/makefile) : Compiles and executes cpp files, and provides plot options of histograms, spin states for variables, expectation values and physical attributes (heath capacity, magnetic susceptibility etc)  
+ - [makefile](https://github.com/Seedsiz/FYS4150-Project4/blob/main/code-and-results/makefile) : Compiles and executes cpp files, and provides plot options of histograms, spin states for variables, expectation values and physical attributes (heath capacity, magnetic susceptibility etc)  
 
 -  [montecarlo.hpp](https://github.com/Seedsiz/FYS4150-Project4/blob/main/code-and-results/montecarlo.hpp) : Headerfile for the superclass MonteCarlo, with subclasses IsingModel2D.
 
