@@ -2,7 +2,7 @@
 Git for Project 4 in Computational Physics (FYS4150).
 
 ### Main overview
-* The programs in this repository aim at finding expectation values for a 2D Ising Model and studying phase transition in a magnetic system, as described in the : [Project 4 - Studies of phase transitions in magnetic systems ](https://github.com/Seedsiz/FYS4150-Project4/blob/main/report/Project%20description.pdf). The final report can be found at: [title](link).
+* The programs in this repository aim at finding expectation values for a 2D Ising Model and studying phase transition in a magnetic system, as described in the : [Project 4 - Studies of phase transitions in magnetic systems ](https://github.com/Seedsiz/FYS4150-Project4/blob/main/report/Project%20description.pdf). The final report can be found at: [title](https://github.com/Seedsiz/FYS4150-Project4/blob/main/report/Aaby_Steinnes_Rashid_exploring_the_ising_model_report.pdf).
 
 * The main challenge was to apply Monte Carlo simulations and the metropolis sampling algorithm to obtain expectation values and study phase transition for a 2D system. To do so a random number generator was used (see link below). In addition the algorithm was parallelized (over temperatures) using OpenMP. Each thread was regarded as a separate experiment, thus each thread has its own unique seed. The spin matrix is initialized once for each thread. For temperatures within that thread, the first Monte Carlo (MC) cycle of the next temperature uses the last spin configuration of the previous temperature.
 
