@@ -19,4 +19,4 @@ time:
 	python3 plottime.py
 
 spin:
-		python3 plotspin.py
+	python3 plotspin.py
