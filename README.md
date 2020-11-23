@@ -58,6 +58,8 @@ After experimentation with the MC cycles, the authors decided to use 20 000 cali
 
 - Documentation on seaborn displot [here](https://seaborn.pydata.org/generated/seaborn.displot.html#seaborn.displot) and heatmaps [here](https://seaborn.pydata.org/generated/seaborn.heatmap.html)
 
+- Documentation on pandas dataframes can be found [here](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html)
+
 - Documentation on parallelization with OpenMP can be found [here](https://www.openmp.org/wp-content/uploads/OpenMP-4.5-1115-CPP-web.pdf) or for more versions [here](https://www.openmp.org/resources/refguides/)
 
 - Documentation on armadillo can be found [here](http://arma.sourceforge.net/docs.html)
