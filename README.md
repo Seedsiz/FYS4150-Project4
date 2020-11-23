@@ -6,7 +6,7 @@ Git for Project 4 in Computational Physics (FYS4150).
 
 * The main challenge was to apply Monte Carlo simulations and the metropolis sampling algorithm to obtain expectation values and study phase transition for a 2D system. To do so a random number generator was used (see link below). In addition the algorithm was parallelized (over temperatures) using OpenMP. Each thread was regarded as a separate experiment, thus each thread has its own unique seed. The spin matrix is initialized once for each thread. For temperatures within that thread, the first Monte Carlo (MC) cycle of the next temperature uses the last spin configuration of the previous temperature.
 
-* Another central task was to verify the algorithm for a 2 by 2 matrix (numerical vs. analytical results), and check method performance with/without parallelization.
+* Another central task was to verify the algorithm for a 2 by 2 matrix (numerical vs. analytical results), and check method performance with/without parallelization. 
 
 * Textfiles and figures can be found in the folder Results.
 
